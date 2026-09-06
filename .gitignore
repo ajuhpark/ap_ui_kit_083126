@@ -1,1 +1,7 @@
 node_modules
+
+# Regenerated on every build-tokens.js run from tokens.json -- no need to track
+tokens/sets/
+
+# Safety-net backups made before editing tracked files by hand -- not real project files
+*.bak
