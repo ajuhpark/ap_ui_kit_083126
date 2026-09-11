@@ -1,0 +1,70 @@
+/* ============================================================================
+ * Foundations/Border -- combines the "width" and "radius" scales into one
+ * page, each its own labeled section. Structure and class shapes copied
+ * 1:1 from ap_ds_storybook's components/Foundations/Border/Border.css.
+ * ============================================================================
+ */
+
+.ap-border-sections {
+	display: flex;
+	flex-direction: column;
+	gap: 2.5rem;
+}
+
+.ap-border-section {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+/* Two-tone section title: "border" muted + "width"/"radius" bold. */
+.ap-foundation-section-title {
+	margin: 0;
+	font-family: -apple-system, system-ui, sans-serif;
+	font-size: 1.125rem;
+	font-weight: 400;
+}
+
+.ap-foundation-title-muted {
+	color: #737373;
+}
+
+.ap-foundation-title-bold {
+	font-weight: 700;
+	color: #1a1a1a;
+}
+
+.ap-border-token-group {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 2rem 2.5rem;
+}
+
+.ap-border-token {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	min-width: 4rem;
+	gap:4px;
+}
+
+.ap-border-token-key {
+	font-family: -apple-system, system-ui, sans-serif;
+	font-size: 1.25rem;
+	font-weight: 700;
+	white-space: nowrap;
+}
+
+.ap-border-token-value {
+	font-family: -apple-system, system-ui, sans-serif;
+	font-size: 1rem;
+	color: #737373;
+}
+
+.ap-border-token-var {
+	margin-top: 0.375rem;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	font-size: 0.75rem;
+	color: #8a8a8a;
+	white-space: nowrap;
+}

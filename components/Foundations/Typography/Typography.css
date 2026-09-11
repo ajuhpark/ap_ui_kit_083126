@@ -1,0 +1,112 @@
+/* ============================================================================
+ * Foundations/Typography -- Font Size (first Typography primitive built).
+ * Structure borrows ap_ds_storybook's Typography.css naming conventions
+ * (.type-token-*), "ap-" prefixed, with two additions specific to
+ * ap_ui_kit's per-font/per-heading-level shape: a collapsible group per
+ * font (.ap-type-font-group*) and a heading-level name on each card
+ * (.ap-type-token-heading-name), since ap_ds_storybook's flat numbered
+ * scale has neither.
+ * ============================================================================
+ */
+
+.ap-type-font-groups {
+	display: flex;
+	flex-direction: column;
+	gap: 2.5rem;
+	font-family: -apple-system, system-ui, sans-serif;
+}
+
+.ap-type-font-group {
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
+}
+
+.ap-type-font-group-header {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	background: none;
+	border: none;
+	padding: 0;
+	margin: 0;
+	cursor: pointer;
+	font: inherit;
+}
+
+.ap-type-font-group-title {
+	font-size: 1.125rem;
+	font-weight: 700;
+	color: #1a1a1a;
+}
+
+.ap-type-font-group-chevron {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	color: #1a1a1a;
+	transition: transform 0.15s ease;
+}
+
+/* Collapsed state points UP (rotate 180deg from the default down-facing
+   icon), not sideways -- a right-pointing chevron would read as "expand
+   to the right", which isn't what this control does. */
+.ap-type-font-group-chevron--collapsed {
+	transform: rotate(180deg);
+}
+
+.ap-type-token-group {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	gap: 2.5rem 3rem;
+}
+
+.ap-type-token-swatch {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	min-width: 12rem;
+}
+
+/* The heading-level name (e.g. "h1", "h2-lg") -- sits above the
+   size/var row, unlike ap_ds_storybook's cards which have no equivalent
+   grouping concept. */
+.ap-type-token-heading-name {
+	font-size: 1rem;
+	font-weight: 500;
+	color: #1a1a1a;
+} 
+
+.ap-type-token-header {
+	display: flex;
+	align-items: baseline;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+.ap-type-token-label {
+	font-family: -apple-system, system-ui, sans-serif;
+	font-size: 0.8rem;
+	font-weight: 600;
+	color: #737373;
+	white-space: nowrap;
+}
+
+.ap-type-token-var {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	font-size: 0.8rem;
+	color: #8a8a8a;
+	white-space: nowrap;
+}
+
+.ap-type-token-sample {
+	color: #1a1a1a;
+	line-height: 1.2;
+	/* Same reasoning as ap_ds_storybook's Typography.css: the
+	   alphabet-triplet sample is single unbroken "words" that would
+	   otherwise force a mid-word line break once font-size pushes them
+	   past the container width. */
+	overflow-wrap: normal;
+	word-wrap: normal;
+}

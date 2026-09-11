@@ -65,7 +65,7 @@ None of this duplicates any component or value: `tier1ColorStories.jsx` and `tie
 
 `.storybook/preview.jsx`'s `parameters.options.storySort.order` pins this exact ordering (Storybook's default alphabetical sort wouldn't otherwise put "1. Core" before "2. Green Tier 1" reliably as more categories get added).
 
-Current scope: **Color only**. Typography and Spacing/Border/Elevation Foundations pages are the natural next pass and would follow the same pattern (a new `generate-<category>-manifest.js`, a swatch/sample component reading live values, and the same per-theme-factory + diff-only approach for their Green/Gold pages).
+Current scope: Color is complete. Border (width + radius) and Typography's Font Size (font1 only) are now underway too -- see the Progress log below for each. Typography's remaining primitives (Line Height, Letter Spacing, Text Case, Font Family, Font Weight, and font2/font3 for Font Size) and Spacing/Elevation Foundations pages are the natural next passes, following the same pattern (a `generate-<category>-manifest.js`, a component reading live values, and the same per-theme-factory + diff-only approach where a category actually varies by theme).
 
 The Viewport dropdown has no visible effect on any Color/Semantic page (color tokens don't vary by viewport) — that's expected, not a bug — but it's wired up globally now so future pages can use it without touching `preview.jsx` again.
 
@@ -84,11 +84,92 @@ To add a new theme or viewport: add one entry to the `THEMES`/`VIEWPORTS` array 
 
 - **Theme + viewport combined simultaneously** — not yet built (see caveat above); needs a decision on whether to do a full cross-product build or change the underlying data.
 - **`tier_1_core.font_weights_font_1`'s numeric medium/thin/heavy values** — still need the intended numeric scale (existing scale is non-standard: light=100, regular=300, semibold=500, bold=700).
-- **Typography / Spacing / Border / Elevation Foundations pages** — not built yet, deliberately deferred.
+- **Typography / Spacing / Elevation Foundations pages** — Border is done; Typography has Font Size (font1 only) so far. The rest (Line Height, Letter Spacing, Text Case, Font Family, Font Weight, font2/font3, Spacing, Elevation) is still deferred.
 - **Dead weight**: root `config.json` and `MyStyleDictionary/` (incl. its own `config.json`) are unused leftovers from the original Style Dictionary tutorial this repo was scaffolded from; same for `output`/`output.json` and the leftover `build/android`, `build/compose`, `build/ios`, `build/ios-swift`, `build/scss` tutorial platforms if they reappear. Safe to delete, just hasn't been done.
 - **`js` platform** was dropped from the build system (only `css` per theme/viewport now) — revisit if a JS variables file turns out to be needed somewhere.
 
 ## Progress log
+
+**2026-09-11 (16) — Font Size now covers font2/font3 too; chevron direction fixed**
+Two small follow-ups on (15)'s Font Size page: the collapsed chevron was
+rotating -90deg (down-facing icon becomes right-facing), which reads as
+"expand sideways" -- changed to `rotate(180deg)` so it points up instead,
+per Andrew's screenshot. Then added `<FontSizeFontGroup>` for `font2` and
+`font3` to `FontSizeScale.jsx` (each was already sitting in `typography-
+manifest.json`, 21 steps apiece, from (15) -- this was just the two extra
+lines that file's own comment said it needed). Verified via `npm run
+build` (21/21/21) + `npx storybook build`.
+
+**2026-09-11 (15) — Added Foundations/Typography > Font Size (font1 only)**
+First Typography page. Since font-size steps are keyed by heading level
+per font (h1, h2-lg, h2, ... -- see (13)/(14)'s research turn) rather than
+a flat numbered scale, the page needed its own layout, not a straight port
+of ap_ds_storybook's `TypeTokenSwatch`: a collapsible section per font
+("font1" + a chevron that toggles the card grid below it, expanded by
+default) with each card showing the heading-level name (e.g. "h1") above
+the usual live size + CSS var row and alphabet-triplet sample -- matching
+Andrew's screenshot layout. Only `font1` renders for now, per instruction;
+`font2`/`font3` are already in the manifest for whenever they're added.
+
+New `scripts/generate-typography-manifest.js` (same "extract names only"
+architecture as the color/border manifests) produces `tokens/generated/
+typography-manifest.json`, filtering out `base`/`heading-scale`/
+`body-text-scale` -- those are the formula parameters h1/h2/... are
+calculated from, not usable size steps themselves. New `components/
+Foundations/Typography/{Typography.css, FontSizeCard.jsx,
+FontSizeFontGroup.jsx, FontSizeScale.jsx, Typography.stories.jsx}`.
+`FontSizeCard` reads its live size via the shared `useLiveCssValue` hook
+and renders its alphabet sample in that font's own live family
+(`--ap-font-families-{font}`), not a fixed one. Hit the same class of bug
+as the original `generate-color-manifest.js` fix, but in this new
+manifest script's own doc-comment: a literal `*/` inside a variable-name
+list closed the JSDoc block comment early, causing a `SyntaxError`. Caught
+and fixed before it ever reached Storybook. Wired into package.json's
+"build" script; verified via `npm run build` (21 steps for font1/font2/font3
+each) + `npx storybook build`'s index.json.
+
+**2026-09-11 (14) — Fixed "React is not defined" on the new Border page**
+`Border.stories.jsx` (added in (13)) uses JSX directly (`<BorderScale />`)
+but was missing `import React from "react"` -- the same classic-JSX-
+transform gap hit earlier in the session (`@storybook/react-vite` doesn't
+bundle `@vitejs/plugin-react` here, so every file with JSX needs React
+explicitly in scope). `BorderToken.jsx`/`BorderScale.jsx` already had the
+import; only the stories file was missing it. Added it; re-verified with
+`npm run build` + `npx storybook build`.
+
+**2026-09-11 (13) — Added Foundations/Border (width + radius), live-computed**
+First page outside Color. Confirmed `--ap-border-width-{0,1,2,4,8}` and
+`--ap-border-radius-{0,2,4,8,16,32,round}` already exist in Core's built
+CSS, essentially matching ap_ds_storybook's set 1:1 (we have one extra,
+`width-0`). Read ap_ds_storybook's `components/Foundations/Border/`
+(`Border.css` / `BorderScale.jsx` / `Border.stories.jsx`) -- one page
+combining two sections (width, radius), each a two-tone title ("border"
+muted + "width"/"radius" bold) above a flex-wrap row of bold-key/muted-
+value/var-name token cards. Unlike Color, it's a flat list per section, no
+family/step sub-split, and (confirmed: no ChocolateTier1/Border or
+StrawberryTier1/Border directories exist there) it doesn't get a per-theme
+page -- border tokens don't vary by theme.
+
+Ported the same way as Color: new `scripts/generate-border-manifest.js`
+(same "extract names only from built CSS, never values" architecture as
+generate-color-manifest.js) produces `tokens/generated/border-manifest.json`
+-- flat `width`/`radius` arrays of `{key, cssVar}`, `key` being everything
+after the prefix (works for both numeric steps and the non-numeric "round").
+New `components/Foundations/Border/Border.css` (`ap-` prefixed port of
+ap_ds_storybook's classes), `BorderToken.jsx` (single token, live value via
+the existing shared `useLiveCssValue` hook -- imported from `../Color/
+useLiveCssValue.js` rather than duplicated, since it's generic, not color-
+specific), `BorderScale.jsx` (the two-section page), and
+`Border.stories.jsx` (`Tokens/Tier 1: Definitions/1. Core/Border`, no
+Green/Gold variant). Wired `generate-border-manifest.js` into package.json's
+"build" script. Verified via `npm run build` (5 width tokens, 7 radius
+tokens) + `npx storybook build`'s index.json.
+
+**2026-09-11 (12) — Storybook's built-in device-preview viewport tool disabled**
+Turns out the "Small mobile" W x H control in the toolbar is a separate thing from our own `viewport` globalType (already hidden in (11)) -- it's Storybook's own core device-preview tool, present by default since Storybook 8, confirmed identical in `ap_ds_storybook` (same `@storybook/addon-a11y`/`addon-docs` devDependencies, no `@storybook/addon-viewport`, no `parameters.viewport` config there either). It defaulting to "Small mobile" here but not there was just `localStorage` -- that tool's selection persists per browser origin (i.e. per dev-server port), so the two projects' dev servers had independently drifted. Added `parameters.viewport.disable = true` to `ap_ui_kit`'s `preview.jsx` to remove the control from the toolbar outright, so it can't drift again regardless of what's in any given browser's local storage.
+
+**2026-09-11 (11) — Theme (Green/Gold) and Viewport toolbar dropdowns hidden for now**
+Removed the `toolbar` block from both the `theme` and `viewport` globalTypes in `.storybook/preview.jsx`, so neither shows up as a toolbar dropdown anymore. Reasoning: the Theme dropdown's Green/Gold options were redundant with the dedicated "Green Tier 1"/"Gold Tier 1"/"Green Tier 2"/"Gold Tier 2" sidebar pages (those pin their own `globals: {theme}` per story, which works with or without a toolbar control for it); the Viewport dropdown is a no-op today since viewport tokens only ever touch fontSize/lineHeights, never color, and Color is still the only scope implemented. `initialGlobals` (`theme: "core"`, `viewport: "mobile"`) and the `withTokenAttributes` decorator are untouched, so `data-theme`/`data-viewport` wiring still works exactly the same -- only the toolbar UI is gone. Re-adding a `toolbar` block to either globalType later (e.g. once Typography/Spacing Foundations need live Viewport switching) brings the dropdown back with no other changes.
 
 **2026-09-11 (10) — Tier 2 semantic card label now matches ap_ds_storybook's `.color-palette-label`**
 Caught by inspection: ap_ds_storybook's Tier 2 pages (`ContentColors.jsx` etc.) render nothing but `<ColorSwatchCardGroup label="content" .../>` -- a small 12px/weight-600/gray/capitalized label (`.color-palette-label`, `margin-bottom: 0.5rem`) directly above the card list, no separate heading. Our `ColorGridSection.jsx` had no such label at all and instead wrapped everything in the much bigger `.ap-color-section__title` (18px/700/black) that Tier 1 pages use -- a heading treatment ap_ds_storybook's Tier 2 doesn't have. Fixed by giving `ColorSwatchCardGroup` a `label` prop (rendered via a new `.ap-color-swatch-card-label` class in `ColorSwatchCard.css`, matching `.color-palette-label`'s properties exactly) and having `ColorGridSection.jsx` pass `grid.title` into it instead of rendering its own `<h3>`. Deliberately a NEW class rather than reusing Tier 1's `.ap-color-palette-label` -- that class has its `margin-bottom` commented out on purpose (Tier 1's `.ap-color-palette` supplies that spacing via its own flex `gap` instead), and Tier 2's card list isn't wrapped in `.ap-color-palette`, so reusing it as-is would've left the label with no spacing below it. Tier 1 files untouched.

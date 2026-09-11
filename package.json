@@ -5,7 +5,7 @@
   "description": "This example code is bare-bones to show you what this framework can do. If you have the style-dictionary module installed globally, you can `cd` into this directory and run: ```bash style-dictionary build ```",
   "main": "build-tokens.js",
   "scripts": {
-    "build": "node build-tokens.js && node scripts/generate-color-manifest.js",
+    "build": "node build-tokens.js && node scripts/generate-color-manifest.js && node scripts/generate-border-manifest.js && node scripts/generate-typography-manifest.js",
     "storybook": "npm run build && storybook dev -p 6006",
     "build-storybook": "npm run build && storybook build",
     "test": "echo \"Error: no test specified\" && exit 1"

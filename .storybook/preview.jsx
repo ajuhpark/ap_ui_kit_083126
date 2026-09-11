@@ -9,12 +9,26 @@ import { TokenPreviewContext } from "../components/TokenPreviewContext.jsx";
  * data attribute ([data-theme="..."], [data-viewport="..."]) so they can be
  * switched on the fly the same way ap_ds_storybook's [data-theme] works.
  *
- * NOTE (see build-tokens.js's architecture caveat): viewport tokens only
- * ever touch fontSize/lineHeights, never color -- so on Color Foundations
- * pages the Viewport dropdown is a deliberate no-op, exactly like
- * ap_ds_storybook's own readouts/theme toolbar is a no-op outside
- * Foundations. It's still wired globally now so Typography/Spacing
- * Foundations pages can use it later without touching this file again.
+ * NOTE: the Theme and Viewport toolbar dropdowns are deliberately NOT
+ * exposed right now (see globalTypes below) -- Theme's Green/Gold options
+ * are redundant with the dedicated "Green Tier 1"/"Gold Tier 1"/"Green Tier
+ * 2"/"Gold Tier 2" sidebar pages (each pins its own `globals: {theme}` on
+ * the story object, which works with or without a toolbar UI for it), and
+ * Viewport tokens only ever touch fontSize/lineHeights, never color, so
+ * it's a no-op on every page that currently exists. `initialGlobals` below
+ * still sets both to a fixed default and withTokenAttributes still reads
+ * them, so nothing about the data-theme/data-viewport wiring changes --
+ * only the toolbar UI is hidden. Re-add a `toolbar` block to either
+ * globalType below to bring the dropdown back (e.g. once Typography/
+ * Spacing Foundations pages need live Viewport switching).
+ *
+ * Separately, `parameters.viewport.disable` below turns off Storybook's
+ * own BUILT-IN device-preview toolbar tool (the "Small mobile" / W x H
+ * control) -- a core Storybook feature, unrelated to the `viewport`
+ * globalType above and present in ap_ds_storybook too (neither project
+ * installs @storybook/addon-viewport or configures this parameter).
+ * Disabling it here removes the whole control from the toolbar so its
+ * selection can't drift from browser to browser via localStorage.
  */
 const withTokenAttributes = (Story, context) => {
 	const { theme, viewport } = context.globals;
@@ -41,28 +55,10 @@ const preview = {
 		theme: {
 			name: "Theme",
 			description: "Color theme (tier_1_core / tier_1_green / tier_1_gold)",
-			toolbar: {
-				icon: "paintbrush",
-				items: [
-					{ value: "core", title: "Core" },
-					{ value: "green", title: "Green" },
-					{ value: "gold", title: "Gold" },
-				],
-				dynamicTitle: true,
-			},
 		},
 		viewport: {
 			name: "Viewport",
 			description: "Viewport scale (mobile / tablet / desktop)",
-			toolbar: {
-				icon: "grow",
-				items: [
-					{ value: "mobile", title: "Mobile" },
-					{ value: "tablet", title: "Tablet" },
-					{ value: "desktop", title: "Desktop" },
-				],
-				dynamicTitle: true,
-			},
 		},
 	},
 	initialGlobals: {
@@ -70,6 +66,12 @@ const preview = {
 		viewport: "mobile",
 	},
 	parameters: {
+		// Hides Storybook's own built-in device-preview toolbar tool -- see
+		// the note above withTokenAttributes for why this is separate from
+		// the (already-hidden) `viewport` globalType above.
+		viewport: {
+			disable: true,
+		},
 		options: {
 			storySort: {
 				// Mirrors ap_ds_storybook's sidebar tree: Tier 1: Definitions
