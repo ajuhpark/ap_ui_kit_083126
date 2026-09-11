@@ -1,5 +1,5 @@
 /* ============================================================================
- * Foundations/Typography -- Font Size (first Typography primitive built).
+ * Foundations/Typography -- Font Size and Line Height.
  * Structure borrows ap_ds_storybook's Typography.css naming conventions
  * (.type-token-*), "ap-" prefixed, with two additions specific to
  * ap_ui_kit's per-font/per-heading-level shape: a collapsible group per
@@ -100,6 +100,26 @@
 	white-space: nowrap;
 }
 
+/* Shared key/value styling, generalized from Foundations/Border's
+   .ap-border-token-key/-value (Border.css) so Letter Spacing can match
+   Border's card look (bold key, lighter value, both stacked above the
+   var name) without Typography reaching into Border's stylesheet for a
+   border-specific class name. Rules are identical to Border's on
+   purpose -- keep the two in sync if either changes. */
+.ap-token-key {
+	font-family: -apple-system, system-ui, sans-serif;
+	font-size: 1.25rem;
+	font-weight: 700;
+	color: #1a1a1a;
+	white-space: nowrap;
+}
+
+.ap-token-value {
+	font-family: -apple-system, system-ui, sans-serif;
+	font-size: 1rem;
+	color: #737373;
+}
+
 .ap-type-token-sample {
 	color: #1a1a1a;
 	line-height: 1.2;
@@ -109,4 +129,15 @@
 	   past the container width. */
 	overflow-wrap: normal;
 	word-wrap: normal;
+}
+
+/* Line Height's sample is real wrapped prose, not Font Size's unbroken
+   alphabet strings -- it needs an actual width constraint so the text
+   wraps onto multiple lines and the leading (the whole point of this
+   page) is visible at all. Font Size's cards stay content-width because
+   a single unbroken line has nothing to wrap. */
+.ap-type-token-sample--leading {
+	max-width: 16rem;
+	word-wrap: break-word;
+	overflow-wrap: break-word;
 }

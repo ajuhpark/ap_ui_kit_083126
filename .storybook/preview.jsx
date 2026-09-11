@@ -1,4 +1,5 @@
 import React from "react";
+import "../assets/fonts/novela/novela.css";
 import "../build/all-themes/css/variables.css";
 import "../build/all-viewports/css/variables.css";
 import { TokenPreviewContext } from "../components/TokenPreviewContext.jsx";

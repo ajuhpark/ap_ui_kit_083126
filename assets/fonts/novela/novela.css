@@ -1,0 +1,78 @@
+/**
+ * Novela (font3) -- self-hosted @font-face declarations.
+ *
+ * WHY THIS FILE EXISTS: font1/font2/font3 were previously just CSS
+ * `font-family` names with no @font-face backing them, relying entirely on
+ * whatever happened to be installed as a system font on the machine
+ * viewing Storybook. For font3/Novela that was actively broken: this
+ * developer's Mac has TWO separate installs of Novela in ~/Library/Fonts
+ * (the foundry .otf originals, plus a second "-webfont.ttf" conversion of
+ * the same family) both claiming the family name "Novela". The OS's font
+ * matcher has to arbitrate between the two per weight/style, and doesn't
+ * do so consistently -- most weights resolved to a face missing glyph
+ * coverage (tofu boxes), while 700/Bold happened to resolve to a complete
+ * one. See the project doc's typography debugging notes for the full
+ * writeup.
+ *
+ * FIX: bundle the actual font files here and declare them via @font-face
+ * with `url()` sources ONLY -- no `local("Novela")` fallback. Browsers
+ * give a page's own @font-face declarations priority over an
+ * OS-installed font of the same name, so this sidesteps the local
+ * collision entirely rather than trying to fix the duplicate install.
+ * Source .otf files converted to .woff2 (via `fonttools ttLib.woff2
+ * compress`) from ~/Library/Fonts/Novela-*.otf -- the plain foundry
+ * originals, NOT the "-webfont" duplicates, since those are the likely
+ * source of the corruption above.
+ *
+ * WEIGHTS: matches the four numeric font-weight values Novela is actually
+ * used at (400/600/700/900). "Display Regular" is a distinct stylistic
+ * variant in the type family (see Figma's weight dropdown), not a step on
+ * the same regular/bold weight axis, so it gets its own family name
+ * ("Novela Display") instead of being force-fit onto `font-weight: 400`
+ * alongside Regular -- picking it is `font-family: "Novela Display"`, not
+ * a font-weight value. This is also why the token pipeline's automatic
+ * fontWeights-name-to-number transform (@tokens-studio/sd-transforms)
+ * shouldn't be numifying `font_weights_font_3.regular` ({"Display
+ * Regular"}) in the first place -- separate, not-yet-applied fix, see
+ * project doc.
+ */
+
+@font-face {
+	font-family: "Novela";
+	src: url("./Novela-Regular.woff2") format("woff2");
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Novela";
+	src: url("./Novela-Semibold.woff2") format("woff2");
+	font-weight: 600;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Novela";
+	src: url("./Novela-Bold.woff2") format("woff2");
+	font-weight: 700;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Novela";
+	src: url("./Novela-Black.woff2") format("woff2");
+	font-weight: 900;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Novela Display";
+	src: url("./Novela-DisplayRegular.woff2") format("woff2");
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}

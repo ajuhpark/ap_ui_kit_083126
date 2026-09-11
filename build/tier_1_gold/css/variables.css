@@ -621,6 +621,12 @@
   --ap-font-size-mobile-font3-default: 16px;
   --ap-letter-spacing-0: 0;
   --ap-letter-spacing-1: 0;
+  --ap-letter-spacing-2: 2px;
+  --ap-letter-spacing-half: 0.5px;
+  --ap-letter-spacing-minus-1: -1px;
+  --ap-letter-spacing-minus-1-half: -1.5px;
+  --ap-letter-spacing-minus-2: -2px;
+  --ap-letter-spacing-minus-half: -0.5px;
   --ap-text-case-none: none;
   --ap-text-case-capitalize: capitalize;
   --ap-text-case-uppercase: uppercase;
