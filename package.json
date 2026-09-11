@@ -5,6 +5,9 @@
   "description": "This example code is bare-bones to show you what this framework can do. If you have the style-dictionary module installed globally, you can `cd` into this directory and run: ```bash style-dictionary build ```",
   "main": "build-tokens.js",
   "scripts": {
+    "build": "node build-tokens.js && node scripts/generate-color-manifest.js",
+    "storybook": "npm run build && storybook dev -p 6006",
+    "build-storybook": "npm run build && storybook build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -17,10 +20,17 @@
     "url": "https://github.com/ajuhpark/ap-ui-kit/issues"
   },
   "homepage": "https://github.com/ajuhpark/ap-ui-kit#readme",
-  "devDependencies": {
-    "style-dictionary": "^5.4.0"
-  },
   "dependencies": {
-    "@tokens-studio/sd-transforms": "^2.0.3"
+    "@tokens-studio/sd-transforms": "^2.0.3",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@storybook/addon-a11y": "^10.3.6",
+    "@storybook/addon-docs": "^10.3.6",
+    "@storybook/react-vite": "^10.3.6",
+    "storybook": "^10.3.6",
+    "style-dictionary": "^5.4.0",
+    "vite": "^6.0.0"
   }
 }

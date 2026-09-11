@@ -3,5 +3,11 @@ node_modules
 # Regenerated on every build-tokens.js run from tokens.json -- no need to track
 tokens/sets/
 
+# Regenerated on every `npm run build` (scripts/generate-color-manifest.js)
+tokens/generated/
+
 # Safety-net backups made before editing tracked files by hand -- not real project files
 *.bak
+
+# Storybook static build output
+storybook-static/

@@ -1,0 +1,107 @@
+/* ============================================================================
+ * Tier 2 semantic swatch cards -- structure and measurements copied 1:1
+ * from ap_ds_storybook's components/Foundations/Color/ColorSwatchCard.css,
+ * with border/text colors pointed at ap_ui_kit's own neutral token
+ * fallbacks instead of ap_ds_storybook's --ds-color-neutral-* values.
+ * ============================================================================
+ */
+
+/* Wraps the optional label + the card list, same as ap_ds_storybook's
+   ColorSwatchCardGroup.jsx's own (unstyled there too) wrapper div. */
+.ap-color-swatch-card-group {
+	display: flex;
+	flex-direction: column;
+}
+
+/* Same properties as ap_ds_storybook's .color-palette-label (12px/600,
+   capitalize, gray, 0.5rem margin-bottom) -- kept as its own class rather
+   than reusing Tier 1's .ap-color-palette-label, because that class has
+   its margin-bottom deliberately commented out (Tier 1's .ap-color-palette
+   provides that spacing via its own flex `gap` instead). Tier 2's card
+   list isn't wrapped in .ap-color-palette, so it needs the margin here. */
+.ap-color-swatch-card-label {
+	font-family: -apple-system, system-ui, sans-serif;
+	font-size: 0.75rem;
+	font-weight: 600;
+	text-transform: capitalize;
+	color: #737373;
+	margin-bottom: 0.5rem;
+}
+
+.ap-color-swatch-card-list {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem; /* 8px */
+	width: 100%;
+	max-width: 25.75rem; /* 412px */
+}
+
+.ap-color-swatch-card {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.5rem;
+	border-radius: 0.25rem;
+	background: #ffffff;
+	border: 1px solid var(--ap-color-neutral-300, #bfc4c8);
+}
+
+.ap-color-swatch-card-swatch {
+	width: 3rem; /* 48px */
+	height: 3rem;
+	border-radius: 0.1875rem;
+	flex-shrink: 0;
+}
+
+.ap-color-swatch-card-swatch--checkered {
+	background-image: linear-gradient(45deg, #ccc 25%, transparent 25%),
+		linear-gradient(-45deg, #ccc 25%, transparent 25%),
+		linear-gradient(45deg, transparent 75%, #ccc 75%),
+		linear-gradient(-45deg, transparent 75%, #ccc 75%);
+	background-size: 12px 12px;
+	background-position: 0 0, 0 6px, 6px -6px, -6px 0;
+}
+
+.ap-color-swatch-card-info {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	padding: 0 0.5rem;
+	min-width: 0;
+}
+
+.ap-color-swatch-card-header {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 0.5rem;
+	flex-wrap: wrap;
+}
+
+.ap-color-swatch-card-name {
+	font-family: -apple-system, system-ui, sans-serif;
+	font-weight: 700;
+	font-size: 0.875rem;
+	line-height: normal;
+	letter-spacing: normal;
+}
+
+.ap-color-swatch-card-hex {
+	font-family: -apple-system, system-ui, sans-serif;
+	font-weight: 400;
+	font-size: 0.875rem;
+	line-height: normal;
+	letter-spacing: normal;
+	color: var(--ap-color-neutral-600, #3d4247);
+}
+
+.ap-color-swatch-card-var {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	font-weight: 400;
+	font-size: 0.75rem;
+	line-height: normal;
+	letter-spacing: normal;
+	color: var(--ap-color-neutral-500, #64696f);
+	word-break: break-all;
+}
