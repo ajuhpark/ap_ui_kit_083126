@@ -1,0 +1,52 @@
+/**
+ * Bricolage Grotesque (font3, Tier 1 Gold) -- self-hosted @font-face
+ * declarations. Same fix as the other families in this project:
+ * `url()`-only sources, no `local("Bricolage Grotesque")` fallback.
+ *
+ * This one has an EXTRA duplicate-install risk beyond the usual
+ * "webfont conversion installed alongside the foundry original" shape:
+ * ~/Library/Fonts has both the static instances bundled below AND
+ * `BricolageGrotesque-VariableFont_opsz,wdth,wght.ttf`, a variable font
+ * that registers named instances under the SAME "Bricolage Grotesque"
+ * family. Two independent files claiming one family name is exactly the
+ * Novela tofu-box shape, so the no-`local()`-fallback fix matters here
+ * as much as anywhere else in this project.
+ *
+ * WEIGHTS: font_weights_font_3 (Gold) resolves light=200, regular=300,
+ * semibold=400, bold=500 (see build/tier_1_gold/css/variables.css's
+ * --ap-font3-*-* vars) -- note this family's steps run a notch lighter
+ * than font1/font2's (light=ExtraLight here, not Light) -- all four have
+ * a real Bricolage Grotesque cut and are bundled below.
+ */
+
+@font-face {
+	font-family: "Bricolage Grotesque";
+	src: url("./BricolageGrotesque-ExtraLight.woff2") format("woff2");
+	font-weight: 200;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Bricolage Grotesque";
+	src: url("./BricolageGrotesque-Light.woff2") format("woff2");
+	font-weight: 300;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Bricolage Grotesque";
+	src: url("./BricolageGrotesque-Regular.woff2") format("woff2");
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Bricolage Grotesque";
+	src: url("./BricolageGrotesque-Medium.woff2") format("woff2");
+	font-weight: 500;
+	font-style: normal;
+	font-display: swap;
+}

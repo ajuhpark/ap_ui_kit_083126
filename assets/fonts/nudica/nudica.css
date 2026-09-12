@@ -1,0 +1,47 @@
+/**
+ * Nudica (font1, Tier 1 Gold) -- self-hosted @font-face declarations.
+ * Same fix as novela.css/basier-circle.css: `url()`-only sources, no
+ * `local("Nudica")` fallback. ~/Library/Fonts has BOTH the foundry
+ * originals (Nudica-*.otf) and a second "-webfont" conversion of the
+ * same family (nudica-*-webfont.ttf) -- the same duplicate-install
+ * shape that caused Novela's tofu boxes. Bundling the foundry originals
+ * here (NOT the -webfont copies) and declaring them with no `local()`
+ * fallback sidesteps that collision entirely.
+ *
+ * WEIGHTS: font_weights_font_1 (Gold) resolves light=300, regular=400,
+ * semibold=500, bold=700 (see build/tier_1_gold/css/variables.css's
+ * --ap-font1-*-* vars) -- all four have a real Nudica cut and are
+ * bundled below.
+ */
+
+@font-face {
+	font-family: "Nudica";
+	src: url("./Nudica-Light.woff2") format("woff2");
+	font-weight: 300;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Nudica";
+	src: url("./Nudica-Regular.woff2") format("woff2");
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Nudica";
+	src: url("./Nudica-Medium.woff2") format("woff2");
+	font-weight: 500;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Nudica";
+	src: url("./Nudica-Bold.woff2") format("woff2");
+	font-weight: 700;
+	font-style: normal;
+	font-display: swap;
+}

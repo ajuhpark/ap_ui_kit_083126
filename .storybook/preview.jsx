@@ -5,6 +5,9 @@ import "../assets/fonts/twk-continental/twk-continental.css";
 import "../assets/fonts/basier-circle/basier-circle.css";
 import "../assets/fonts/basier-square/basier-square.css";
 import "../assets/fonts/basier-square-mono/basier-square-mono.css";
+import "../assets/fonts/nudica/nudica.css";
+import "../assets/fonts/quablo/quablo.css";
+import "../assets/fonts/bricolage-grotesque/bricolage-grotesque.css";
 import "../build/all-combinations/css/variables.css";
 import { TokenPreviewContext } from "../components/TokenPreviewContext.jsx";
 
