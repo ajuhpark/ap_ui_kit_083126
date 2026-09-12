@@ -76,9 +76,20 @@ npm install
 npm run build             # node build-tokens.js && node scripts/generate-color-manifest.js
 npm run storybook          # builds tokens, then starts the Storybook dev server on :6006
 npm run build-storybook    # builds tokens, then produces a static storybook-static/ build
+npm run deploy-storybook   # publishes storybook-static/ to GitHub Pages (the gh-pages branch)
 ```
 
 To add a new theme or viewport: add one entry to the `THEMES`/`VIEWPORTS` array at the top of `build-tokens.js` (name — matches the Token Studio set name — source set(s), CSS selector). Nothing else needs to change.
+
+### Publishing Storybook to GitHub Pages
+
+The live site is deployed via the `gh-pages` package, which pushes the contents of `storybook-static/` to a `gh-pages` branch on `origin` — GitHub Pages serves straight from that branch. Going forward, redeploying the Storybook site is just:
+
+```bash
+npm run build-storybook && npm run deploy-storybook
+```
+
+any time you want to publish the latest version. Currently live at https://ajuhpark.github.io/ap_ui_kit_083126/ (this URL follows the repo's current name on GitHub, so it'll change if the repo is ever renamed).
 
 ## Known issues / open items
 
