@@ -1,0 +1,60 @@
+/**
+ * TWK Continental (font2, Tier 1 Core) -- self-hosted @font-face
+ * declarations. Same fix and reasoning as novela.css/twk-lausanne.css:
+ * `url()`-only sources, no `local()` fallback, so the OS's own installed
+ * copy (and any duplicate conversions of it) can never win.
+ *
+ * WEIGHTS: tier_1_core.font_weights_font_2 maps light/regular/semibold/
+ * bold to NAMED weights (Light/Regular/Book/Bold), not numbers directly.
+ * The token pipeline's name-to-number transform resolves "Regular" and
+ * "Book" to the SAME numeric value (400 -- see build/tier_1_core/css/
+ * variables.css's --ap-font-weights-font-2-regular AND -semibold, both
+ * 400), but they are two distinct real font files on disk
+ * (TWKContinental-Regular vs TWKContinental-Book). A single @font-face
+ * weight slot can only point at one file, so -- same move as Novela's
+ * "Display Regular" getting its own "Novela Display" family instead of
+ * fighting for a slot on the regular/bold axis -- Book gets its own
+ * family name, "TWK Continental Book", instead of colliding with Regular
+ * at font-weight: 400. Whichever composite/token actually wants Book
+ * should reference `font-family: "TWK Continental Book"` directly rather
+ * than relying on font-weight to pick it (it can't).
+ *
+ * Only light(300)/regular(400)/bold(700) are bundled under the base
+ * "TWK Continental" family -- those are the numeric steps
+ * font_weights_font_2 actually resolves to besides the Book collision
+ * above. Source .ttf files came from ~/Library/Fonts/TWKContinental-
+ * {Light,Regular,Bold,Book}.ttf, converted to .woff2 the same way as
+ * TWK Lausanne/Novela.
+ */
+
+@font-face {
+	font-family: "TWK Continental";
+	src: url("./TWKContinental-Light.woff2") format("woff2");
+	font-weight: 300;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "TWK Continental";
+	src: url("./TWKContinental-Regular.woff2") format("woff2");
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "TWK Continental";
+	src: url("./TWKContinental-Bold.woff2") format("woff2");
+	font-weight: 700;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "TWK Continental Book";
+	src: url("./TWKContinental-Book.woff2") format("woff2");
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}

@@ -1,0 +1,51 @@
+/**
+ * Basier Square (font2, Tier 1 Green/Gold) -- self-hosted @font-face
+ * declarations. Same fix and reasoning as basier-circle.css: this
+ * developer's ~/Library/Fonts has both the foundry originals
+ * (BasierSquare-*.otf) and a duplicate "-webfont" conversion
+ * (basiersquare-*-webfont.ttf) of the same family -- the foundry
+ * originals are bundled here, with no `local()` fallback, so the page's
+ * own font always wins regardless of which copy the OS resolves to.
+ *
+ * WEIGHTS: font_weights_font_2 (Green/Gold) resolves light=400,
+ * regular=500, semibold=600, bold=700 (see build/tier_1_green/css/
+ * variables.css's --ap-font-weights-font-2-* vars) -- all four have a
+ * real Basier Square face and are bundled below.
+ *
+ * GAP (same as Basier Circle, not a tofu-box issue): "thin"(100)/
+ * "heavy"(900) steps exist in the tokens but no Basier Square Thin/Black
+ * cut exists in ~/Library/Fonts -- those weights will synthesize off the
+ * nearest real face rather than show missing glyphs.
+ */
+
+@font-face {
+	font-family: "Basier Square";
+	src: url("./BasierSquare-Regular.woff2") format("woff2");
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Basier Square";
+	src: url("./BasierSquare-Medium.woff2") format("woff2");
+	font-weight: 500;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Basier Square";
+	src: url("./BasierSquare-SemiBold.woff2") format("woff2");
+	font-weight: 600;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Basier Square";
+	src: url("./BasierSquare-Bold.woff2") format("woff2");
+	font-weight: 700;
+	font-style: normal;
+	font-display: swap;
+}

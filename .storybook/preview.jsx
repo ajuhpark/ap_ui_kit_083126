@@ -1,5 +1,10 @@
 import React from "react";
 import "../assets/fonts/novela/novela.css";
+import "../assets/fonts/twk-lausanne/twk-lausanne.css";
+import "../assets/fonts/twk-continental/twk-continental.css";
+import "../assets/fonts/basier-circle/basier-circle.css";
+import "../assets/fonts/basier-square/basier-square.css";
+import "../assets/fonts/basier-square-mono/basier-square-mono.css";
 import "../build/all-combinations/css/variables.css";
 import { TokenPreviewContext } from "../components/TokenPreviewContext.jsx";
 

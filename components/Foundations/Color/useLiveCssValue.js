@@ -52,3 +52,36 @@ export function useLiveCssValue(cssVar) {
 
 	return [ref, value];
 }
+
+/**
+ * Same idea as useLiveCssValue, but reads SEVERAL css vars off ONE node in
+ * a single effect -- needed for Tier 2 Semantic Typography's composite
+ * style cards, which display the `font` shorthand value alongside its
+ * three companion vars (letter-spacing/text-transform/text-decoration,
+ * see build-tokens.js) and need all four reads to agree on exactly which
+ * DOM node they came from. Calling useLiveCssValue four times wouldn't
+ * work here -- each call owns its own internal ref, and only one of those
+ * four refs could ever actually be attached to the sample element.
+ * Returns `[ref, values]` where `values` is a plain object keyed by the
+ * css var name (e.g. `values["--ap-tier-2-typography-body-lg"]`).
+ */
+export function useLiveCssValues(cssVars) {
+	const ref = useRef(null);
+	const [values, setValues] = useState({});
+	const { theme, viewport } = useTokenPreview();
+	const cssVarsKey = cssVars.join("|");
+
+	useEffect(() => {
+		const node = ref.current;
+		if (!node) return;
+		const computed = getComputedStyle(node);
+		const next = {};
+		for (const cssVar of cssVarsKey.split("|")) {
+			next[cssVar] = computed.getPropertyValue(cssVar).trim();
+		}
+		setValues(next);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [cssVarsKey, theme, viewport]);
+
+	return [ref, values];
+}

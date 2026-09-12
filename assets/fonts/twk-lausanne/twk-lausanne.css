@@ -1,0 +1,54 @@
+/**
+ * TWK Lausanne (font1, Tier 1 Core) -- self-hosted @font-face declarations.
+ *
+ * Same fix as assets/fonts/novela/novela.css: font1/font2/font3 were only
+ * CSS `font-family` names with nothing backing them, so rendering depended
+ * entirely on whatever the viewing machine happened to have installed --
+ * exactly what caused Novela's tofu boxes. Bundling the real files here and
+ * declaring them via @font-face with `url()` sources ONLY (no
+ * `local("TWK Lausanne")` fallback) means the page's own font always wins
+ * over an OS-installed copy of the same family, whatever state that
+ * install is in.
+ *
+ * WEIGHTS: TWK Lausanne ships as a numeric weight axis (TWKLausanne-100.ttf
+ * ... -1000.ttf on disk), and tier_1_core.font_weights_font_1 already
+ * references the numeric scale directly (`{fontWeights_choices_numbers.*}`,
+ * no name-to-number transform involved) -- light=100, regular=300,
+ * semibold=500, bold=700 (see build/tier_1_core/css/variables.css's
+ * --ap-font-weights-font-1-* vars). Only those four steps are bundled,
+ * matching what the token pipeline actually uses; the source .ttf files
+ * came from ~/Library/Fonts/TWKLausanne-*.ttf, converted to .woff2 via
+ * `fontTools.ttLib.TTFont(...).flavor = "woff2"`.
+ */
+
+@font-face {
+	font-family: "TWK Lausanne";
+	src: url("./TWKLausanne-100.woff2") format("woff2");
+	font-weight: 100;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "TWK Lausanne";
+	src: url("./TWKLausanne-300.woff2") format("woff2");
+	font-weight: 300;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "TWK Lausanne";
+	src: url("./TWKLausanne-500.woff2") format("woff2");
+	font-weight: 500;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "TWK Lausanne";
+	src: url("./TWKLausanne-700.woff2") format("woff2");
+	font-weight: 700;
+	font-style: normal;
+	font-display: swap;
+}

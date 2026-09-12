@@ -1,0 +1,57 @@
+/**
+ * Basier Circle (font1, Tier 1 Green/Gold) -- self-hosted @font-face
+ * declarations. Same fix as novela.css: `url()`-only sources, no
+ * `local("Basier Circle")` fallback -- this developer's ~/Library/Fonts
+ * has BOTH the foundry originals (BasierCircle-*.otf) and a second
+ * "-webfont" conversion of the same family (basiercircle-*-webfont.ttf),
+ * the exact same duplicate-install shape that caused Novela's tofu boxes.
+ * Bundling the foundry originals here (NOT the -webfont copies) and
+ * declaring them with no `local()` fallback sidesteps that collision
+ * entirely rather than relying on the OS to pick the right one.
+ *
+ * WEIGHTS: font_weights_font_1 (Green/Gold) resolves light=400,
+ * regular=500, semibold=600, bold=700 (see build/tier_1_green/css/
+ * variables.css's --ap-font-weights-font-1-* vars) -- all four have a
+ * real Basier Circle face and are bundled below.
+ *
+ * GAP (not a tofu-box issue, flagging separately): font_weights_font_1
+ * also defines "thin" (100) and "heavy" (900) steps, but no Basier Circle
+ * Thin/Black cut exists anywhere in ~/Library/Fonts -- applying
+ * font-weight: 100 or 900 will make the browser synthesize a fake
+ * thin/bold on top of whichever real weight is closest, not show missing
+ * glyphs. Only a real problem if/when something actually uses the
+ * thin/heavy steps; worth getting real font files for those weights from
+ * Andrew if that happens.
+ */
+
+@font-face {
+	font-family: "Basier Circle";
+	src: url("./BasierCircle-Regular.woff2") format("woff2");
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Basier Circle";
+	src: url("./BasierCircle-Medium.woff2") format("woff2");
+	font-weight: 500;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Basier Circle";
+	src: url("./BasierCircle-SemiBold.woff2") format("woff2");
+	font-weight: 600;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Basier Circle";
+	src: url("./BasierCircle-Bold.woff2") format("woff2");
+	font-weight: 700;
+	font-style: normal;
+	font-display: swap;
+}

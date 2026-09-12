@@ -8,10 +8,9 @@
  *
  * Covers Font Size, Line Height (per font: font1/font2/font3), Letter
  * Spacing (flat, not per-font), Font Weight (Tokens Studio's own raw
- * groups), and Font Family (flat, per font: font1/font2/font3) so far.
- * Text Case can extend this manifest the same way once that page is
- * built -- see build/tier_1_core/css/variables.css for the full set of
- * already-built variables this could read from.
+ * groups), Font Family (flat, per font: font1/font2/font3), and Tier 2
+ * Semantic Typography's composite styles (Display/Headline/Title/Label/
+ * Body/Meta -- see COMPOSITE STYLES below).
  *
  * fontSize and lineHeight are keyed by heading level names (h1, h2-lg, h2,
  * ...) rather than a flat numbered scale like ap_ds_storybook's -- see the
@@ -30,16 +29,22 @@
  * naming convention (0, 2, half, minus-1, minus-1-half, minus-2,
  * minus-half) plus this project's own pre-existing "1" placeholder.
  *
- * UNIT NOTE (lineHeight only): unlike --ap-font-size-*, which the
- * tokens-studio transform group emits with a "px" suffix baked in (e.g.
- * "39px"), --ap-line-heights-* is emitted as a bare unitless number (e.g.
- * "46") even though these are absolute-pixel leading values (base *
- * heading-scale^n, same formula shape as fontSize), not CSS's usual
- * unitless line-height ratios. Consumers can't use `line-height:
- * var(--ap-line-heights-font1-h1)` as-is -- that reads as a 46x
- * multiplier, not 46px. LineHeightCard.jsx works around this at the point
- * of use with `calc(var(...) * 1px)`; this manifest just records the
- * cssVar names, same as fontSize.
+ * UNIT NOTE (lineHeight only): @tokens-studio/sd-transforms' generic
+ * `ts/size/lineheight` transform treats bare numbers as CSS's native
+ * unitless line-height RATIO convention and deliberately leaves them
+ * alone -- correct for that convention, but this project's
+ * `lineHeights.*` tokens are actually absolute-pixel leading values (base
+ * * heading-scale^n, same formula shape as fontSize), not ratios. Left
+ * unitless, `line-height: var(--ap-line-heights-font1-h1)` would read as
+ * a 46x multiplier, not 46px -- and the SAME bare number lands inside
+ * Tier 2's composite `font` shorthand too (`18px/28` means "28x
+ * line-height", not 28px). Fixed at the BUILD level, not here:
+ * build-tokens.js registers a custom `ap/lineheight/px` value transform
+ * (see its "LINE HEIGHT UNIT FIX" header comment) that appends "px" to
+ * every resolved lineHeight value, standalone AND inside typography
+ * composites, so --ap-line-heights-* now carries "px" the same way
+ * --ap-font-size-* always has. This manifest just records the cssVar
+ * names either way, same as fontSize.
  *
  * --ap-letter-spacing-* does NOT have this problem, even though it's also
  * built via a @tokens-studio/sd-transforms $type-specific transform
@@ -82,6 +87,40 @@
  * font2/font3 group, one CSS var each (--ap-font-families-font1/2/3),
  * same "font1/font2/font3" keys already used as the `font` selector
  * elsewhere on this page (FontSizeCard, LineHeightCard, etc.).
+ *
+ * COMPOSITE STYLES (Tier 2 Semantic Typography -- Display/Headline/
+ * Title/Label/Body/Meta): unlike everything above, these live under
+ * tier_2 in tokens.json, not tier_1, and are `$type: "typography"`
+ * COMPOSITE tokens (fontFamily/fontWeight/lineHeight/fontSize/
+ * letterSpacing/textCase/textDecoration bundled into one token) rather
+ * than single-property scales. build-tokens.js's `typography/css/
+ * shorthand` transform collapses each one into a single CSS `font`
+ * shorthand custom property (e.g. `--ap-tier-2-typography-body-lg: 300
+ * 18px/28 'TWK Lausanne';`) -- see build-tokens.js's header comment for
+ * the full pros/cons of that "one-liner" approach vs. ap_ds_storybook's
+ * SCSS-mixin-per-style approach, and for why letter-spacing/text-
+ * transform/text-decoration need their own separate companion custom
+ * properties (`--<token>-letter-spacing` etc., also built there) since
+ * the CSS `font` shorthand structurally can't include them.
+ *
+ * This script only needs to enumerate the composite tokens' NAMES (same
+ * "never values" rule as the rest of this manifest) grouped by style
+ * family (display/headline/title/label/body/meta) and ordered by size
+ * within each family -- CompositeStyleCard.jsx derives the three
+ * companion var names from the shorthand var's name at render time
+ * (`${cssVar}-letter-spacing` etc.) rather than this manifest storing
+ * them separately, since they're always a fixed suffix away.
+ *
+ * Like fontSize/lineHeight/fontFamily (and unlike Font Weight), Green/
+ * Gold's composite styles are a full-scale replacement, not a per-item
+ * diff: confirmed against the built CSS that tier_1_green/tier_1_gold's
+ * font_weights_font_1 AND fontFamilies both differ from Core for every
+ * composite style that references them (which is all of them), so no
+ * composite-style item ever coincidentally matches Core the way some
+ * individual Font Weight values do. That means there's nothing to filter
+ * -- CompositeStyles.jsx is reused completely unchanged for Green/Gold,
+ * same pattern as FontSizeScale/LineHeightScale/FontFamilyScale, just
+ * pinned to the theme global.
  *
  * ---------------------------------------------------------------------
  * GREEN TIER 1 / GOLD TIER 1: tokens.json's tier_1_green/tier_1_gold
@@ -225,6 +264,46 @@ function buildFontWeightThemeDiff(coreValues, themeCssPath) {
 	})).filter((group) => group.items.length > 0);
 }
 
+// Tier 2 Semantic Typography's composite styles -- see COMPOSITE STYLES
+// in the header comment. `--ap-tier-2-typography-<group>-<item>` (e.g.
+// "body-lg", "meta-small") -- everything after the group's own name is
+// the item key, so this splits only on the FIRST hyphen after the group
+// name rather than blindly splitting the whole remainder on "-" (some
+// item keys, like meta's "small", have no hyphen at all, but nothing
+// here has a hyphenated group name to worry about either way). Companion
+// vars (`-letter-spacing`/`-text-transform`/`-text-decoration`) are
+// excluded here -- they're a fixed suffix CompositeStyleCard.jsx derives
+// from the shorthand var itself, not a separate manifest entry.
+const COMPOSITE_PREFIX = "--ap-tier-2-typography-";
+const COMPOSITE_GROUP_ORDER = ["display", "headline", "title", "label", "body", "meta"];
+const COMPOSITE_ITEM_ORDER = ["lg", "default", "sm", "xs", "small"];
+const COMPOSITE_COMPANION_SUFFIXES = ["-letter-spacing", "-text-transform", "-text-decoration"];
+
+function buildCompositeStyles(allNames) {
+	const byGroup = new Map();
+	for (const cssVar of allNames) {
+		if (!cssVar.startsWith(COMPOSITE_PREFIX)) continue;
+		if (COMPOSITE_COMPANION_SUFFIXES.some((suffix) => cssVar.endsWith(suffix))) continue;
+		const rest = cssVar.slice(COMPOSITE_PREFIX.length); // e.g. "body-lg", "meta-small"
+		const dashIndex = rest.indexOf("-");
+		const group = dashIndex === -1 ? rest : rest.slice(0, dashIndex);
+		const item = dashIndex === -1 ? "default" : rest.slice(dashIndex + 1);
+		if (!byGroup.has(group)) byGroup.set(group, []);
+		byGroup.get(group).push({ key: item, cssVar });
+	}
+	const orderedGroups = [...COMPOSITE_GROUP_ORDER, ...Array.from(byGroup.keys()).filter((g) => !COMPOSITE_GROUP_ORDER.includes(g))];
+	return orderedGroups
+		.filter((group) => byGroup.has(group))
+		.map((group) => ({
+			groupName: group,
+			items: byGroup.get(group).sort((a, b) => {
+				const ai = COMPOSITE_ITEM_ORDER.indexOf(a.key);
+				const bi = COMPOSITE_ITEM_ORDER.indexOf(b.key);
+				return (ai === -1 ? COMPOSITE_ITEM_ORDER.length : ai) - (bi === -1 ? COMPOSITE_ITEM_ORDER.length : bi);
+			}),
+		}));
+}
+
 const allNames = parseCssVarNames(fs.readFileSync(CORE_CSS_PATH, "utf-8"));
 const coreValues = parseCssVarValues(fs.readFileSync(CORE_CSS_PATH, "utf-8"));
 
@@ -247,6 +326,7 @@ const manifest = {
 		green: buildFontWeightThemeDiff(coreValues, THEME_CSS_PATHS.green),
 		gold: buildFontWeightThemeDiff(coreValues, THEME_CSS_PATHS.gold),
 	},
+	compositeStyles: buildCompositeStyles(allNames),
 };
 
 fs.mkdirSync(OUT_DIR, { recursive: true });
@@ -260,5 +340,6 @@ console.log(
 		`letter-spacing steps: ${manifest.letterSpacing.length}; ` +
 		`font-weight groups -- ${manifest.fontWeight.map((g) => `${g.groupName}: ${g.items.length}`).join(", ")}; ` +
 		`font-family steps: ${manifest.fontFamily.length}; ` +
-		`font-weight theme diffs: ${fontWeightDiffCounts})`,
+		`font-weight theme diffs: ${fontWeightDiffCounts}; ` +
+		`composite styles -- ${manifest.compositeStyles.map((g) => `${g.groupName}: ${g.items.length}`).join(", ")})`,
 );

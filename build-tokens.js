@@ -52,6 +52,66 @@
  * each compound selector only matches its own exact (theme, viewport)
  * attribute pair, so unlike two `:root`-scoped rules layered from
  * different files, there's nothing for two rules to collide over.
+ *
+ * TIER 2 SEMANTIC TYPOGRAPHY -- COMPANION CUSTOM PROPERTIES:
+ * Every `tier_2_typography` composite token (Display/Headline/Title/
+ * Label/Body/Meta) collapses to a single CSS `font` shorthand custom
+ * property via @tokens-studio/sd-transforms' `typography/css/shorthand`
+ * transform (part of the `tokens-studio` transformGroup) -- e.g.
+ * `--ap-tier-2-typography-body-lg: 300 18px/28px 'TWK Lausanne';`. That
+ * shorthand can only ever express font-style/variant/weight/stretch/
+ * size/line-height/family -- letterSpacing, textCase, and textDecoration
+ * are STRUCTURALLY IMPOSSIBLE to fold into the CSS `font` shorthand (a
+ * spec limitation, not a tooling gap -- see the project doc's "Composite
+ * typography styles" section for the full pros/cons comparison against
+ * ap_ds_storybook's SCSS-mixin approach, which sets each property as its
+ * own declaration and therefore doesn't have this limitation).
+ *
+ * Rather than switch to mixins, each `build()` call below runs a SECOND,
+ * separate Style Dictionary pass over the exact same source files and
+ * selector, using every `tokens-studio` transform EXCEPT
+ * `typography/css/shorthand` -- so each composite token's resolved value
+ * stays the full {fontFamily, fontWeight, lineHeight, fontSize,
+ * letterSpacing, textCase, textDecoration} object for one extra format
+ * (`css/typography-companion`, registered below) to pull just those
+ * three otherwise-lost properties out as their own companion custom
+ * properties (`--<token>-letter-spacing`, `-text-transform`,
+ * `-text-decoration`), appended into the SAME destination file right
+ * after the shorthand vars. Consumers use both together, e.g.:
+ *   font: var(--ap-tier-2-typography-body-lg);
+ *   letter-spacing: var(--ap-tier-2-typography-body-lg-letter-spacing);
+ *   text-transform: var(--ap-tier-2-typography-body-lg-text-transform);
+ *   text-decoration: var(--ap-tier-2-typography-body-lg-text-decoration);
+ * This keeps the one-liner shorthand for the properties it CAN express
+ * (still far more compact than a mixin per style) while completing the
+ * composite definition for the three it can't.
+ *
+ * LINE HEIGHT UNIT FIX:
+ * @tokens-studio/sd-transforms' `ts/size/lineheight` transform treats
+ * lineHeight tokens as a CSS-native unitless ratio (e.g. `1.5`, meaning
+ * "1.5x the font size") and deliberately leaves plain numbers unitless --
+ * correct for THAT convention, but this project's `lineHeights.*` tokens
+ * are actually absolute pixel leading values computed by the same
+ * base*scale^n formula as fontSize (e.g. 46, meaning 46px, not "46x the
+ * font size"). Left as-is, that reads as a wildly wrong line-height
+ * everywhere it's used raw -- including inside the Tier 2 composite
+ * `font` shorthand above, e.g. `18px/28` is CSS for "18px text, 28x
+ * line-height" (~504px of leading) rather than the intended 28px.
+ * `ap/lineheight/px` (registered below) is a custom value transform,
+ * inserted immediately after `ts/size/lineheight` in the transform list,
+ * that appends "px" to any already-resolved bare-number lineHeight value
+ * -- for both standalone `lineHeights.*` tokens (their own `$type`
+ * resolves to the singular "lineHeight" by the time transforms run, not
+ * the plural "lineHeights" tokens.json uses -- the tokens-studio
+ * preprocessor normalizes DTCG type names) and for the `lineHeight`
+ * sub-field of `typography`-composite tokens (Tier 1's font1/font2/font3
+ * heading composites and Tier 2's semantic composites alike), fixing the
+ * shorthand's embedded value too. Needs an explicit `transforms` array
+ * (built from the `tokens-studio` group's own list, see MAIN_TRANSFORMS
+ * below) rather than `transformGroup: "tokens-studio"` plus an appended
+ * extra, since inserting a transform in the MIDDLE of the group's order
+ * -- after size resolution, before the shorthand composer packs
+ * everything into one string -- isn't possible by appending alone.
  * ============================================================================
  */
 
@@ -60,6 +120,97 @@ import StyleDictionary from "style-dictionary";
 import { register } from "@tokens-studio/sd-transforms";
 
 register(StyleDictionary);
+
+// Appends "px" to an already-resolved, unitless numeric lineHeight value --
+// see the LINE HEIGHT UNIT FIX header comment above for why this is needed
+// and why it can't just be `ts/size/lineheight` itself (that transform's
+// job, per its own semantics, is to treat unitless numbers as CSS's ratio
+// convention and leave them alone). `transitive: true` is required here:
+// Style Dictionary only runs a value transform on a token whose ORIGINAL
+// (pre-resolution) $value still contained `{alias}` syntax -- true for
+// every one of these formula-driven lineHeight tokens -- if that
+// transform is marked transitive, matching how `ts/size/lineheight`
+// itself and the other size/shorthand transforms in this pipeline behave.
+StyleDictionary.registerTransform({
+	name: "ap/lineheight/px",
+	type: "value",
+	transitive: true,
+	filter: (token) =>
+		token.$type === "lineHeight" ||
+		(token.$type === "typography" && token.$value && typeof token.$value === "object"),
+	transform: (token) => {
+		const toPx = (v) => {
+			if (v === undefined || v === null) return v;
+			if (typeof v === "number") return `${v}px`;
+			if (typeof v === "string" && /^-?\d+(\.\d+)?$/.test(v.trim())) return `${v.trim()}px`;
+			return v; // already has a unit (or isn't a bare number) -- leave alone
+		};
+		if (token.$type === "lineHeight") {
+			return toPx(token.$value);
+		}
+		return { ...token.$value, lineHeight: toPx(token.$value.lineHeight) };
+	},
+});
+
+// Emits ONLY the three companion properties for tier_2_typography composite
+// tokens (Tier 1's font1/font2/font3 composite tokens exist in the data too
+// but aren't surfaced as their own Storybook page yet, so there's nothing
+// that would consume companion vars for them -- scoped to tier_2_typography
+// on purpose, not a limitation of this format itself).
+StyleDictionary.registerFormat({
+	name: "css/typography-companion",
+	format: ({ dictionary, options }) => {
+		const lines = dictionary.allTokens
+			.filter(
+				(t) =>
+					t.attributes?.category === "tier_2_typography" &&
+					t.$type === "typography" &&
+					t.$value &&
+					typeof t.$value === "object",
+			)
+			.flatMap((t) => {
+				const { letterSpacing, textCase, textDecoration } = t.$value;
+				return [
+					`  --${t.name}-letter-spacing: ${letterSpacing};`,
+					`  --${t.name}-text-transform: ${textCase};`,
+					`  --${t.name}-text-decoration: ${textDecoration};`,
+				];
+			});
+		if (lines.length === 0) return "";
+		return `${options.selector ?? ":root"} {\n${lines.join("\n")}\n}\n`;
+	},
+});
+
+// Same transform list `transformGroup: "tokens-studio"` expands to, with
+// `ap/lineheight/px` inserted right after `ts/size/lineheight` (see LINE
+// HEIGHT UNIT FIX above) -- this is the shared base both real transform
+// lists below build from.
+const TS_GROUP_TRANSFORMS = StyleDictionary.hooks.transformGroups["tokens-studio"];
+const LINEHEIGHT_PX_INSERT_AT = TS_GROUP_TRANSFORMS.indexOf("ts/size/lineheight") + 1;
+const BASE_TRANSFORMS = [
+	...TS_GROUP_TRANSFORMS.slice(0, LINEHEIGHT_PX_INSERT_AT),
+	"ap/lineheight/px",
+	...TS_GROUP_TRANSFORMS.slice(LINEHEIGHT_PX_INSERT_AT),
+];
+
+// The main build's transform list: BASE_TRANSFORMS (group + lineheight-px
+// fix) with `name/kebab` appended again at the end -- the group already
+// runs `name/kebab` then `name/camel` in that order, so re-appending
+// `name/kebab` here makes it the last transform of the "name" type to
+// run, and names come out kebab-case (matching the old
+// `transformGroup: "tokens-studio", transforms: ["name/kebab"]` config's
+// actual behavior -- SD appends an explicit `transforms` array onto an
+// expanded `transformGroup` rather than replacing it, confirmed against
+// this project's own build output).
+const MAIN_TRANSFORMS = [...BASE_TRANSFORMS, "name/kebab"];
+
+// The companion-vars build's transform list: BASE_TRANSFORMS minus the
+// shorthand-collapsing transform (see the TIER 2 SEMANTIC TYPOGRAPHY
+// header comment) with `name/kebab` appended the same way.
+const TYPOGRAPHY_PARTS_TRANSFORMS = [
+	...BASE_TRANSFORMS.filter((t) => t !== "typography/css/shorthand"),
+	"name/kebab",
+];
 
 const SETS_DIR = "tokens/sets";
 const raw = JSON.parse(fs.readFileSync("tokens.json", "utf-8"));
@@ -123,6 +274,11 @@ const VIEWPORTS = [
  * viewport_tablet AND viewport_desktop into one build), that's a REAL bug
  * (ambiguous, last-one-silently-wins) rather than an expected override --
  * re-enable `warnings: "warn"` temporarily if you suspect that's happened.
+ *
+ * After the main shorthand build, runs the companion pass described in the
+ * header comment (Tier 2 Semantic Typography's letter-spacing/text-
+ * transform/text-decoration) over the SAME sourceFiles/selector, and
+ * appends its output into the same destination file.
  */
 async function build(sourceFiles, buildPath, destination, selector) {
 	const sd = new StyleDictionary({
@@ -131,8 +287,7 @@ async function build(sourceFiles, buildPath, destination, selector) {
 		preprocessors: ["tokens-studio"],
 		platforms: {
 			css: {
-				transformGroup: "tokens-studio",
-				transforms: ["name/kebab"],
+				transforms: MAIN_TRANSFORMS,
 				prefix: "ap",
 				buildPath,
 				options: { selector },
@@ -142,6 +297,34 @@ async function build(sourceFiles, buildPath, destination, selector) {
 	});
 	await sd.cleanAllPlatforms();
 	await sd.buildAllPlatforms();
+
+	const companionDestination = `_companion-${destination}`;
+	const companionSd = new StyleDictionary({
+		log: { warnings: "disabled" },
+		source: sourceFiles,
+		preprocessors: ["tokens-studio"],
+		platforms: {
+			css: {
+				transforms: TYPOGRAPHY_PARTS_TRANSFORMS,
+				prefix: "ap",
+				buildPath,
+				options: { selector },
+				files: [{ destination: companionDestination, format: "css/typography-companion" }],
+			},
+		},
+	});
+	await companionSd.cleanAllPlatforms();
+	await companionSd.buildAllPlatforms();
+
+	const mainPath = `${buildPath}${destination}`;
+	const companionPath = `${buildPath}${companionDestination}`;
+	if (fs.existsSync(companionPath)) {
+		const companionContent = fs.readFileSync(companionPath, "utf-8");
+		if (companionContent.trim().length > 0) {
+			fs.appendFileSync(mainPath, "\n" + companionContent);
+		}
+		fs.rmSync(companionPath);
+	}
 }
 
 // ============================================================================

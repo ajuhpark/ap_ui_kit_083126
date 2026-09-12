@@ -202,3 +202,82 @@
 	word-wrap: break-word;
 	overflow-wrap: break-word;
 }
+
+/* Tier 2 Semantic Typography's composite styles (Display/Headline/Title/
+   Label/Body/Meta) -- one card per size variant, laid out in a column
+   (not a wrapped row like .ap-type-token-group) since each sample's
+   width varies a lot more than a fixed-size swatch grid and the readout
+   row below it needs its own full-width line. */
+.ap-type-composite-group {
+	display: flex;
+	flex-direction: column;
+	gap: 2rem;
+}
+
+.ap-type-composite-card {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	padding-bottom: 2rem;
+	border-bottom: 1px solid #e5e5e5;
+}
+
+.ap-type-composite-card:last-child {
+	border-bottom: none;
+	padding-bottom: 0;
+}
+
+.ap-type-composite-sample {
+	color: #1a1a1a;
+	/* font/letter-spacing/text-transform/text-decoration all come from
+	   the live var() values set inline (see CompositeStyleCard.jsx) --
+	   nothing typographic is hard-coded here. */
+	overflow-wrap: break-word;
+	word-wrap: break-word;
+}
+
+/* Composite card readout row -- matches ap_ds_storybook's
+   composite-style-card-readout-row structure/markup (label, var name,
+   "|" separator, value), "ap-" prefixed like everything else in this
+   file. All four pieces share one font-size on purpose: the label used
+   to sit in the sans-serif UI font at the same nominal size as the
+   monospace var/value text next to it, but sans and monospace fonts
+   don't render the same nominal size as visually the same size (mono
+   faces tend to look larger at an identical font-size), so the label
+   read as noticeably smaller. Giving every piece the same font-family
+   as well as the same font-size is what actually makes them look like
+   one consistent row instead of just being numerically equal. */
+.ap-type-composite-readout-row {
+	display: flex;
+	align-items: baseline;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+.ap-type-composite-readout-label {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	font-size: 0.8rem;
+	font-weight: 400;
+	color: #1a1a1a;
+	white-space: nowrap;
+}
+
+.ap-type-composite-readout-var {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	font-size: 0.8rem;
+	color: #8a8a8a;
+	white-space: nowrap;
+}
+
+.ap-type-composite-readout-sep {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	font-size: 0.8rem;
+	color: #d4d4d4;
+}
+
+.ap-type-composite-readout-value {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	font-size: 0.8rem;
+	font-weight: 400;
+	color: #1a1a1a;
+}
