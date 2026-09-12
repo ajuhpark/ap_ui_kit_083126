@@ -28,9 +28,13 @@
  * every theme/viewport build because build-tokens.js's BASE_SOURCE includes
  * tier_2.json in all of them, so "core" is as good a source of names as any.
  *
- * ALSO produces manifest.tier2ThemeDiffs.{green,gold} -- the subset of
- * tier_2 semantic vars whose RESOLVED VALUE actually differs from core for
- * that theme. Most of Content/Background/Border only ever reference
+ * manifest.grids is the FULL tier_2 semantic list (Content/Background/
+ * Border, all 63 tokens) -- this is what the Core Tier 2 Color page
+ * (Semantic.stories.jsx) renders.
+ *
+ * manifest.tier2ThemeDiffs.{green,gold} is the subset of those same tier_2
+ * semantic vars whose RESOLVED VALUE actually differs from core for that
+ * theme. Most of Content/Background/Border only ever reference
  * color.neutral / color_palettes / utility, which never change per theme
  * -- only entries that ultimately reference color.brand.* do. This is
  * computed by diffing the already-built CSS for each theme against core's,
@@ -42,6 +46,13 @@
  * where Green/Gold only show "Brand" -- confirmed via tokens/sets/
  * tier_1_green.json / tier_1_gold.json that "brand" is the only key their
  * `color` object overrides at all).
+ *
+ * grids and tier2ThemeDiffs share the exact same TIER2_PREFIXES list (and
+ * so the same "Content"/"Background"/"Border" titles) so
+ * tier2SemanticStories.jsx can look a grid up by title regardless of
+ * whether it's rendering the full Core list or a theme-diffed one --
+ * same component, same label, just a different, possibly-filtered items
+ * array.
  *
  * Run after build-tokens.js (see package.json's "build" script). Output is
  * regenerated every time, same as tokens/sets/ and build/ -- not tracked in
@@ -164,6 +175,10 @@ function buildGrid(prefix, label, only) {
 	};
 }
 
+// Shared by both the full (Core) grids below and the per-theme diffs --
+// same prefixes, same titles, so a story can look a grid up by title
+// ("Content"/"Background"/"Border") regardless of which list it's reading
+// from.
 const TIER2_PREFIXES = [
 	["--ap-tier-2-color-content-", "Content"],
 	["--ap-tier-2-color-background-", "Background"],
@@ -218,11 +233,7 @@ const manifest = {
 		// ap_ds_storybook's TransparentColors.jsx -- not a "grid" card.
 		buildFlatScale("--ap-color-transparent-", "Transparent"),
 	],
-	grids: [
-		buildGrid("--ap-tier-2-color-content-", "Semantic — Content"),
-		buildGrid("--ap-tier-2-color-background-", "Semantic — Background"),
-		buildGrid("--ap-tier-2-color-border-", "Semantic — Border"),
-	],
+	grids: TIER2_PREFIXES.map(([prefix, label]) => buildGrid(prefix, label)),
 	tier2ThemeDiffs: {
 		green: buildTier2ThemeDiff(THEME_CSS_PATHS.green),
 		gold: buildTier2ThemeDiff(THEME_CSS_PATHS.gold),
@@ -235,5 +246,7 @@ const diffCounts = Object.entries(manifest.tier2ThemeDiffs)
 	.map(([theme, grids]) => `${theme}=${grids ? grids.reduce((n, g) => n + g.items.length, 0) : "n/a"}`)
 	.join(", ");
 console.log(
-	`✔︎ ${OUT_PATH} (${colorVars.length} color tokens; Color Palettes families: ${colorPalettesScale.families.length}, Data Viz families: ${dataVizScale.families.length}; tier_2 diffs: ${diffCounts})`,
+	`✔︎ ${OUT_PATH} (${colorVars.length} color tokens; Color Palettes families: ${colorPalettesScale.families.length}, Data Viz families: ${dataVizScale.families.length}; ` +
+		`tier_2 full grids -- ${manifest.grids.map((g) => `${g.title}: ${g.items.length}`).join(", ")}; ` +
+		`tier_2 diffs: ${diffCounts})`,
 );

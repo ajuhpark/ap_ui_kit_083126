@@ -1,17 +1,11 @@
 import { makeTier1ColorStories } from "./tier1ColorStories.jsx";
 
 /**
- * Sidebar: Tokens > Tier 1: Definitions > 2. Green Tier 1 > Color
- *
- * Only shows Brand -- confirmed via tokens/sets/tier_1_green.json that
- * "brand" is the ONLY key green's `color` object overrides (Color
- * Palettes, Utility, Neutral, and Transparent are defined once in Core and
- * never overridden per-theme, so they'd be exact duplicates of the Core
- * page here). Same live-computed component as "1. Core" -- just pinned to
- * the green theme (see tier1ColorStories.jsx).
+ * Core contains the complete set of Tier 1 color tokens. Green Tier 1
+ * and Gold Tier 1 only contain the tokens that differ from Core.
  */
 export default {
-	title: "Tokens/Tier 1: Definitions/2. Green Tier 1/Color",
+	title: "Tokens/Tier 1: Definitions/Tier 1 - Green/Color",
 	parameters: { layout: "padded" },
 };
 

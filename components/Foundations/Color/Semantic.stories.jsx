@@ -5,11 +5,11 @@ import { makeTier2SemanticStories } from "./tier2SemanticStories.jsx";
  * Tier 2 and Gold Tier 2 only contain the tokens that differ from Core.
  */
 export default {
-	title: "Tokens/Tier 2: Semantic/Tier 2 - Gold/Color",
+	title: "Tokens/Tier 2: Semantic/Tier 2 - Core/Color",
 	parameters: { layout: "padded" },
 };
 
-const stories = makeTier2SemanticStories("gold");
+const stories = makeTier2SemanticStories("core");
 
 export const Content = stories.Content;
 export const Background = stories.Background;

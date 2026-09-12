@@ -1,14 +1,11 @@
 import { makeTier1ColorStories } from "./tier1ColorStories.jsx";
 
 /**
- * Sidebar: Tokens > Tier 1: Definitions > 3. Gold Tier 1 > Color
- *
- * Only shows Brand -- same reasoning as ColorGreen.stories.jsx (confirmed
- * via tokens/sets/tier_1_gold.json: "brand" is the only key gold's `color`
- * object overrides).
+ * Core contains the complete set of Tier 1 color tokens. Green Tier 1
+ * and Gold Tier 1 only contain the tokens that differ from Core.
  */
 export default {
-	title: "Tokens/Tier 1: Definitions/3. Gold Tier 1/Color",
+	title: "Tokens/Tier 1: Definitions/Tier 1 - Gold/Color",
 	parameters: { layout: "padded" },
 };
 

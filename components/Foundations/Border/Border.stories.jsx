@@ -2,12 +2,11 @@ import React from "react";
 import { BorderScale } from "./BorderScale.jsx";
 
 /**
- * Sidebar: Tokens > Tier 1: Definitions > 1. Core > Border
- * Border tokens don't vary per theme (no Green/Gold Border page), same as
- * ap_ds_storybook -- its Border page only ever exists once, under Core.
+ * Border tokens are the same across every theme, so there's no
+ * separate Green or Gold Tier 1 page -- this Core page covers all three.
  */
 export default {
-	title: "Tokens/Tier 1: Definitions/1. Core/Border",
+	title: "Tokens/Tier 1: Definitions/Tier 1 - Core/Border",
 };
 
 export const Border = { render: () => <BorderScale /> };

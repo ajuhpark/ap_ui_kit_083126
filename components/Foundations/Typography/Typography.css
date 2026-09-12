@@ -16,6 +16,62 @@
 	font-family: -apple-system, system-ui, sans-serif;
 }
 
+/* Font Size/Line Height's local Viewport toggle (see
+   ViewportPreviewPanel.jsx) -- note + segmented control, sitting above
+   the font groups on just these two pages. */
+.ap-type-viewport-panel {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	margin-bottom: 2.5rem;
+}
+
+.ap-type-responsive-note {
+	margin: 0;
+	padding: 0.75rem 1rem;
+	background: #f5f5f5;
+	border-left: 3px solid #8a8a8a;
+	border-radius: 0 0.25rem 0.25rem 0;
+	font-family: -apple-system, system-ui, sans-serif;
+	font-size: 0.875rem;
+	line-height: 1.5;
+	color: #4d4d4d;
+}
+
+.ap-type-responsive-note strong {
+	color: #1a1a1a;
+	font-weight: 700;
+}
+
+.ap-type-viewport-toggle {
+	display: inline-flex;
+	align-self: flex-start;
+	border: 1px solid #d4d4d4;
+	border-radius: 0.375rem;
+	overflow: hidden;
+}
+
+.ap-type-viewport-toggle-button {
+	font-family: -apple-system, system-ui, sans-serif;
+	font-size: 0.8125rem;
+	font-weight: 600;
+	color: #4d4d4d;
+	background: #fff;
+	border: none;
+	border-right: 1px solid #d4d4d4;
+	padding: 0.4rem 0.9rem;
+	cursor: pointer;
+}
+
+.ap-type-viewport-toggle-button:last-child {
+	border-right: none;
+}
+
+.ap-type-viewport-toggle-button--active {
+	background: #1a1a1a;
+	color: #fff;
+}
+
 .ap-type-font-group {
 	display: flex;
 	flex-direction: column;

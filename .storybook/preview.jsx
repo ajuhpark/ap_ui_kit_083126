@@ -1,38 +1,48 @@
 import React from "react";
 import "../assets/fonts/novela/novela.css";
-import "../build/all-themes/css/variables.css";
-import "../build/all-viewports/css/variables.css";
+import "../build/all-combinations/css/variables.css";
 import { TokenPreviewContext } from "../components/TokenPreviewContext.jsx";
 
 /**
  * ap_ui_kit has TWO independent toggleable dimensions (ap_ds_storybook only
- * has one, Theme) -- see build-tokens.js. Both bundles above are scoped by
- * data attribute ([data-theme="..."], [data-viewport="..."]) so they can be
- * switched on the fly the same way ap_ds_storybook's [data-theme] works.
+ * has one, Theme) -- see build-tokens.js. build/all-combinations/css/
+ * variables.css has one block per (theme, viewport) pair -- 9 total --
+ * each scoped by a COMPOUND selector (`[data-theme="green"][data-viewport
+ * ="mobile"]`, etc.), so an element matches exactly one block whenever
+ * BOTH attributes are present on it. Every token in the project (color,
+ * border, typography, everything) lives inside one of these 9 blocks now
+ * -- there's no more single-axis `[data-theme="green"]`-only or
+ * `[data-viewport="mobile"]`-only fallback -- so `data-viewport` must
+ * always be present wherever `data-theme` is, or NOTHING resolves there.
  *
- * NOTE: the Theme and Viewport toolbar dropdowns are deliberately NOT
- * exposed right now (see globalTypes below) -- Theme's Green/Gold options
- * are redundant with the dedicated "Green Tier 1"/"Gold Tier 1"/"Green Tier
- * 2"/"Gold Tier 2" sidebar pages (each pins its own `globals: {theme}` on
- * the story object, which works with or without a toolbar UI for it), and
- * Viewport tokens only ever touch fontSize/lineHeights, never color, so
- * it's a no-op on every page that currently exists. `initialGlobals` below
- * still sets both to a fixed default and withTokenAttributes still reads
- * them, so nothing about the data-theme/data-viewport wiring changes --
- * only the toolbar UI is hidden. Re-add a `toolbar` block to either
- * globalType below to bring the dropdown back (e.g. once Typography/
- * Spacing Foundations pages need live Viewport switching).
+ * NOTE: Theme's toolbar dropdown is deliberately NOT exposed -- its
+ * Green/Gold options are redundant with the dedicated "Tier 1 - Green"/
+ * "Tier 1 - Gold"/"Tier 2 - Green"/"Tier 2 - Gold" sidebar pages (each pins
+ * its own `globals: {theme}` on the story object, which works with or
+ * without a toolbar UI for it).
  *
- * Separately, `parameters.viewport.disable` below turns off Storybook's
- * own BUILT-IN device-preview toolbar tool (the "Small mobile" / W x H
- * control) -- a core Storybook feature, unrelated to the `viewport`
- * globalType above and present in ap_ds_storybook too (neither project
- * installs @storybook/addon-viewport or configures this parameter).
- * Disabling it here removes the whole control from the toolbar so its
- * selection can't drift from browser to browser via localStorage.
+ * There is deliberately NO toolbar/global for viewport at all. An earlier
+ * version of this file exposed one (as a `deviceScale` global, named to
+ * avoid colliding with Storybook's own reserved "viewport" global/addon --
+ * see git history if that collision needs revisiting for something else
+ * later). It was removed because a Storybook-wide toolbar control is the
+ * wrong shape for this: viewport only ever affects Font Size and Line
+ * Height -- Color, Border, Letter Spacing, Font Weight, and Font Family
+ * never read a viewport-scoped token -- so a global toggle would show up
+ * doing nothing on every other page in the project. Font Size and Line
+ * Height now carry their OWN local Mobile/Tablet/Desktop toggle instead
+ * (see ViewportPreviewPanel.jsx), scoped to exactly the two pages where it
+ * matters. `data-viewport` below is fixed at "desktop" -- every OTHER
+ * token type resolves identically no matter which viewport is active (the
+ * viewport sets only ever redirect fontSize/lineHeights' headingScale/
+ * bodyTextScale aliases), so "desktop" here is just a stable default for
+ * everything outside those two pages; ViewportPreviewPanel overrides it
+ * locally for its own subtree via a nested TokenPreviewContext.Provider,
+ * independent of this fixed value.
  */
 const withTokenAttributes = (Story, context) => {
-	const { theme, viewport } = context.globals;
+	const { theme } = context.globals;
+	const viewport = "desktop";
 	return (
 		<TokenPreviewContext.Provider value={{ theme, viewport }}>
 			<div data-theme={theme} data-viewport={viewport} style={{ padding: "1.5rem" }}>
@@ -57,36 +67,38 @@ const preview = {
 			name: "Theme",
 			description: "Color theme (tier_1_core / tier_1_green / tier_1_gold)",
 		},
-		viewport: {
-			name: "Viewport",
-			description: "Viewport scale (mobile / tablet / desktop)",
-		},
 	},
 	initialGlobals: {
 		theme: "core",
-		viewport: "mobile",
 	},
 	parameters: {
-		// Hides Storybook's own built-in device-preview toolbar tool -- see
-		// the note above withTokenAttributes for why this is separate from
-		// the (already-hidden) `viewport` globalType above.
+		// Hides Storybook's own built-in device-preview toolbar tool (the
+		// "Small mobile" / W x H control) -- a core Storybook feature,
+		// unrelated to anything of ours, present in ap_ds_storybook too
+		// (neither project installs @storybook/addon-viewport or otherwise
+		// configures it beyond this). Disabling it here removes the whole
+		// control from the toolbar so its selection can't drift from
+		// browser to browser via localStorage.
 		viewport: {
 			disable: true,
 		},
 		options: {
 			storySort: {
-				// Mirrors ap_ds_storybook's sidebar tree: Tier 1: Definitions
-				// (Core first, then the two themes as their own pinned-theme
-				// pages), then Tier 2: Semantic (theme-pinned pages only --
-				// no separate "Core" entry, same as ap_ds_storybook not
-				// having a "Core Tier 2").
+				// Mirrors Tier 1's own tree: Core first, then the two themes
+				// as their own pinned-theme pages -- for BOTH Tier 1:
+				// Definitions and Tier 2: Semantic. Tier 2 originally had no
+				// "Core" entry (only Green Tier 2/Gold Tier 2 existed,
+				// mirroring ap_ds_storybook not having a "Core Tier 2"), but
+				// that left the full, undiffed semantic list with nowhere to
+				// render -- Core is the base every theme diffs against, so
+				// it needs a page here just like Tier 1's does.
 				order: [
 					"Tokens",
 					[
 						"Tier 1: Definitions",
-						["1. Core", "2. Green Tier 1", "3. Gold Tier 1"],
+						["Tier 1 - Core", "Tier 1 - Green", "Tier 1 - Gold"],
 						"Tier 2: Semantic",
-						["Green Tier 2", "Gold Tier 2"],
+						["Tier 2 - Core", "Tier 2 - Green", "Tier 2 - Gold"],
 					],
 				],
 			},

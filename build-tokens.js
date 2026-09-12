@@ -23,18 +23,35 @@
  * used for, without that corruption -- see the project doc's
  * "Debugging findings" section for the full story.
  *
- * IMPORTANT ARCHITECTURE CAVEAT (see project doc for more):
- * tier_1_green/tier_1_gold each carry their OWN copy of the per-viewport
- * fontSize/lineHeights scale constants (e.g. green's desktop heading scale
- * is 1.5, core's is 1.25, gold's is 1.4) -- meaning "theme" and "viewport"
- * are not fully independent axes at the data level. This script builds
- * each dimension standalone against a sensible default for the other
- * (themes build against the implicit mobile-first default baked into
- * tier_1_core; viewports build against the "core" theme). If a page needs
- * BOTH a non-core theme AND a non-mobile viewport active simultaneously,
- * these two bundles alone won't combine correctly -- that needs a real
- * cross-product build (core|green|gold) x (mobile|tablet|desktop), which
- * hasn't been built yet pending confirmation this is actually needed.
+ * THEME x VIEWPORT CROSS-PRODUCT (see project doc for more):
+ * tier_1_green/tier_1_gold each carry their OWN complete copy of
+ * fontSize/lineHeights' `desktop`/`tablet`/`mobile` sub-scales (e.g.
+ * green's desktop heading scale is 1.5, core's is 1.25, gold's is 1.4) --
+ * "theme" and "viewport" are NOT independent axes at the data level. Each
+ * theme's top-level `font1.headingScale` (etc.) is just an alias to
+ * `{fontSize.desktop.font1.headingScale}` by default; the viewport_mobile/
+ * tablet/desktop sets each redirect that SAME alias to that theme's own
+ * `mobile`/`tablet`/`desktop` sub-scale instead. So layering a theme's set
+ * THEN a viewport's set (in that order -- see COMBINATIONS below) resolves
+ * the alias against that theme's own re-defined breakpoint scale, not
+ * core's -- e.g. green + mobile correctly resolves to green's mobile
+ * headingScale (1.25), giving h1 = 16 x 1.25^4 ~= 39, distinct from both
+ * green's own desktop value (81) and core's mobile value (28).
+ *
+ * An earlier version of this script built THEMES and VIEWPORTS as two
+ * fully independent single-axis bundles (all-themes.css / all-viewports
+ * .css), each defaulting the OTHER axis to a fixed value (themes always
+ * built against core's viewport defaults; viewports always built against
+ * core's theme) -- meaning a page with both a non-core theme AND a
+ * non-desktop viewport active would silently show the wrong numbers,
+ * because neither bundle ever combined the two. COMBINATIONS below fixes
+ * this by building the full 3x3 cross-product directly, each block scoped
+ * by a COMPOUND selector (`[data-theme="..."][data-viewport="..."]`) so
+ * every one of the 9 theme/viewport pairs gets its own real, correct
+ * values with no ambiguity or cascade-order dependence between blocks --
+ * each compound selector only matches its own exact (theme, viewport)
+ * attribute pair, so unlike two `:root`-scoped rules layered from
+ * different files, there's nothing for two rules to collide over.
  * ============================================================================
  */
 
@@ -61,25 +78,28 @@ const BASE_SOURCE = [writeSet("tier_1_core"), writeSet("tier_2")];
  * To add a new theme or viewport later:
  * 1) Confirm the matching Token Studio set name (must exist as a top-level
  *    key in tokens.json)
- * 2) Add an entry below with its build name, source set(s), and selector
- * That's it -- no other file needs to change.
+ * 2) Add an entry below with its build name, source set(s), attribute
+ *    value, and standalone selector
+ * That's it -- no other file needs to change; COMBINATIONS below derives
+ * the cross-product automatically from these same two arrays.
  */
 // `name` doubles as the build folder name (build/<name>/...) -- kept
 // matching the exact Token Studio set names so the output folders are
-// recognizable against the sets list in Token Studio. `selector` is the
-// runtime CSS attribute value instead (kept short/clean for actually
-// writing `data-theme="green"` in markup) -- separate on purpose, change
-// it too if you'd rather the attribute values matched the set names.
+// recognizable against the sets list in Token Studio. `attrValue` is the
+// runtime attribute value (`data-theme="green"`, `data-viewport="mobile"`)
+// -- separate from `name` on purpose, change it too if you'd rather the
+// attribute values matched the set names. `selector` is only used for the
+// PASS 1 standalone (single-axis, `:root`-scoped) builds below.
 const THEMES = [
-	{ name: "tier_1_core", sets: [], selector: ":root" },
-	{ name: "tier_1_green", sets: ["tier_1_green"], selector: '[data-theme="green"]' },
-	{ name: "tier_1_gold", sets: ["tier_1_gold"], selector: '[data-theme="gold"]' },
+	{ name: "tier_1_core", sets: [], attrValue: "core", selector: ":root" },
+	{ name: "tier_1_green", sets: ["tier_1_green"], attrValue: "green", selector: '[data-theme="green"]' },
+	{ name: "tier_1_gold", sets: ["tier_1_gold"], attrValue: "gold", selector: '[data-theme="gold"]' },
 ];
 
 const VIEWPORTS = [
-	{ name: "viewport_mobile", sets: ["viewport_mobile"], selector: ":root" },
-	{ name: "viewport_tablet", sets: ["viewport_tablet"], selector: '[data-viewport="tablet"]' },
-	{ name: "viewport_desktop", sets: ["viewport_desktop"], selector: '[data-viewport="desktop"]' },
+	{ name: "viewport_mobile", sets: ["viewport_mobile"], attrValue: "mobile", selector: ":root" },
+	{ name: "viewport_tablet", sets: ["viewport_tablet"], attrValue: "tablet", selector: '[data-viewport="tablet"]' },
+	{ name: "viewport_desktop", sets: ["viewport_desktop"], attrValue: "desktop", selector: '[data-viewport="desktop"]' },
 ];
 
 /**
@@ -127,8 +147,12 @@ async function build(sourceFiles, buildPath, destination, selector) {
 // ============================================================================
 // PASS 1: standalone builds -- one per theme, one per viewport, each scoped
 // to :root so it's usable entirely on its own (e.g. if you only ever want
-// the gold theme, build/gold/css/variables.css is a complete, self-
-// contained set of variables).
+// the gold theme, build/tier_1_gold/css/variables.css is a complete,
+// self-contained set of variables). Each one resolves the OTHER axis
+// against its own implicit default (themes resolve viewport-affected
+// tokens against their own `desktop` sub-scale; viewports resolve against
+// core's theme) -- these are single-axis references, not the real
+// cross-product (see COMBINATIONS below for that).
 // ============================================================================
 for (const theme of THEMES) {
 	const sources = [...BASE_SOURCE, ...theme.sets.map(writeSet)];
@@ -143,31 +167,40 @@ for (const vp of VIEWPORTS) {
 }
 
 // ============================================================================
-// PASS 2: combined, selector-scoped bundles -- one file per dimension, each
-// theme/viewport rebuilt a second time scoped to its own selector instead
-// of :root, then concatenated. This is what you actually import at runtime
-// to get on/off switching via `data-theme` / `data-viewport` attributes.
+// PASS 2: the real cross-product bundle -- every (theme, viewport) pair,
+// each block scoped by a COMPOUND selector so it only ever matches that
+// exact attribute pair on the themed wrapper div. Sources are layered
+// theme-then-viewport so the viewport set's alias-redirect (which points
+// at `{fontSize.<breakpoint>.fontN.headingScale}`) resolves against that
+// THEME's own re-defined breakpoint sub-scale, not core's -- see the
+// header comment above for why that ordering matters. This is what you
+// actually import at runtime to get correct values no matter which theme
+// and viewport are both active simultaneously.
 // ============================================================================
-async function buildBundle(items, bundleName, attrName) {
-	console.log(`\n=== Building bundle: ${bundleName} ===`);
-	const bundleDir = `build/${bundleName}/css`;
+async function buildCombinationsBundle() {
+	console.log(`\n=== Building bundle: all-combinations ===`);
+	const bundleDir = `build/all-combinations/css`;
 	fs.mkdirSync(bundleDir, { recursive: true });
 
 	const chunks = [];
-	for (const item of items) {
-		const sources = [...BASE_SOURCE, ...item.sets.map(writeSet)];
-		const tempDestination = `_temp-${item.name}.css`;
-		await build(sources, `${bundleDir}/`, tempDestination, item.selector);
-		const tempPath = `${bundleDir}/${tempDestination}`;
-		chunks.push(fs.readFileSync(tempPath, "utf-8"));
-		fs.rmSync(tempPath);
+	for (const theme of THEMES) {
+		for (const vp of VIEWPORTS) {
+			const sources = [...BASE_SOURCE, ...theme.sets.map(writeSet), ...vp.sets.map(writeSet)];
+			const selector = `[data-theme="${theme.attrValue}"][data-viewport="${vp.attrValue}"]`;
+			const tempDestination = `_temp-${theme.name}-${vp.name}.css`;
+			await build(sources, `${bundleDir}/`, tempDestination, selector);
+			const tempPath = `${bundleDir}/${tempDestination}`;
+			chunks.push(fs.readFileSync(tempPath, "utf-8"));
+			fs.rmSync(tempPath);
+		}
 	}
 
 	fs.writeFileSync(`${bundleDir}/variables.css`, chunks.join("\n\n"));
-	console.log(`✔︎ ${bundleDir}/variables.css (combined, ${attrName}-scoped)`);
+	console.log(
+		`✔︎ ${bundleDir}/variables.css (combined, [data-theme][data-viewport]-scoped, ${THEMES.length}x${VIEWPORTS.length}=${THEMES.length * VIEWPORTS.length} combinations)`,
+	);
 }
 
-await buildBundle(THEMES, "all-themes", "data-theme");
-await buildBundle(VIEWPORTS, "all-viewports", "data-viewport");
+await buildCombinationsBundle();
 
 console.log("\nBuild complete.");

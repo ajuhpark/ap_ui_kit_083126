@@ -6,15 +6,19 @@ import { FontWeightScale } from "./FontWeightScale.jsx";
 import { FontFamilyScale } from "./FontFamilyScale.jsx";
 
 /**
- * Sidebar: Tokens > Tier 1: Definitions > 3. Gold Tier 1 > Typography
- * Same reasoning as TypographyGreen.stories.jsx -- see there for why
- * Font Size/Line Height/Font Family reuse their Core components
- * unchanged (full-scale differences) while Font Weight passes
- * manifest.fontWeightThemeDiffs.gold (a real per-item diff) through
- * FontWeightScale's `groups` prop instead of the full manifest.fontWeight.
+ * Core contains the complete set of Tier 1 typography tokens. Green
+ * Tier 1 and Gold Tier 1 only contain the tokens that differ from Core.
  */
 export default {
-	title: "Tokens/Tier 1: Definitions/3. Gold Tier 1/Typography",
+	title: "Tokens/Tier 1: Definitions/Tier 1 - Gold/Typography",
+	parameters: {
+		docs: {
+			description: {
+				component:
+					"Font Size and Line Height are responsive: their values change per breakpoint. Each of those two pages has its own Mobile / Tablet / Desktop toggle to preview them for this theme. Font Weight and Font Family are not affected by viewport at all.",
+			},
+		},
+	},
 };
 
 export const FontSize = {

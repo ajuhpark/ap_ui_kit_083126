@@ -1,12 +1,11 @@
 import { makeTier2SemanticStories } from "./tier2SemanticStories.jsx";
 
 /**
- * Sidebar: Tokens > Tier 2: Semantic > Green Tier 2 > Color
- * Mirrors ap_ds_storybook's "Tier 2: Semantic / Strawberry Tier 2 / Color" /
- * "Chocolate Tier 2" split -- pinned to green (see tier2SemanticStories.jsx).
+ * Core contains the complete set of Tier 2 semantic color tokens. Green
+ * Tier 2 and Gold Tier 2 only contain the tokens that differ from Core.
  */
 export default {
-	title: "Tokens/Tier 2: Semantic/Green Tier 2/Color",
+	title: "Tokens/Tier 2: Semantic/Tier 2 - Green/Color",
 	parameters: { layout: "padded" },
 };
 
