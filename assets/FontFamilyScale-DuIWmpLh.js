@@ -1,0 +1,50 @@
+import{R as e,r as h}from"./iframe-CDKT6lrn.js";import{V as f,m as i}from"./Typography-ba4VxVJ6.js";import{u as l}from"./useLiveCssValue-CcNxMxdM.js";const w=["ABCDEFGHIJKLMNOPQRSTUVWXYZ","abcdefghijklmnopqrstuvwxyz","0123456789"];function g({font:n,headingName:a,cssVar:t}){const[s,o]=l(t),r=`--ap-font-families-${n}`;return e.createElement("div",{className:"ap-type-token-swatch",ref:s},e.createElement("div",{className:"ap-type-token-heading-name"},a),e.createElement("div",{className:"ap-type-token-header"},e.createElement("span",{className:"ap-type-token-label"},o||"…"),e.createElement("span",{className:"ap-type-token-var"},t)),e.createElement("div",{className:"ap-type-token-sample",style:{fontFamily:`var(${r}), sans-serif`,fontSize:`var(${t})`}},w.map(p=>e.createElement("div",{key:p},p))))}g.__docgenInfo={description:`One Font Size card: the heading-level name (e.g. "h1") on its own line,
+then the live size value + CSS var name, then an alphabet-triplet
+sample rendered at that live size, in that font's own live family.
+Everything is read via useLiveCssValue -- never hand-typed.`,methods:[],displayName:"FontSizeCard"};const S=()=>e.createElement("svg",{width:"12",height:"12",viewBox:"0 0 12 12",fill:"none",xmlns:"http://www.w3.org/2000/svg","aria-hidden":"true"},e.createElement("path",{d:"M2.5 4.5L6 8L9.5 4.5",stroke:"currentColor",strokeWidth:"1.5",strokeLinecap:"round",strokeLinejoin:"round"}));function c({font:n,items:a}){const[t,s]=h.useState(!0);return e.createElement("div",{className:"ap-type-font-group"},e.createElement("button",{type:"button",className:"ap-type-font-group-header",onClick:()=>s(o=>!o),"aria-expanded":t},e.createElement("span",{className:"ap-type-font-group-title"},n),e.createElement("span",{className:`ap-type-font-group-chevron${t?"":" ap-type-font-group-chevron--collapsed"}`},e.createElement(S,null))),t&&e.createElement("div",{className:"ap-type-token-group"},a.map(o=>e.createElement(g,{key:o.cssVar,font:n,headingName:o.key,cssVar:o.cssVar}))))}c.__docgenInfo={description:`Collapsible section for one font's Font Size scale: a clickable
+"font1 [chevron]" header that toggles the card grid below it. Expanded
+by default.`,methods:[],displayName:"FontSizeFontGroup"};function F(){return e.createElement(f,null,e.createElement("div",{className:"ap-type-font-groups"},e.createElement(c,{font:"font1",items:i.fontSize.font1}),e.createElement(c,{font:"font2",items:i.fontSize.font2}),e.createElement(c,{font:"font3",items:i.fontSize.font3})))}F.__docgenInfo={description:`Font Size page -- one collapsible group per font, wrapped in its own
+local Mobile/Tablet/Desktop toggle (see ViewportPreviewPanel.jsx).`,methods:[],displayName:"FontSizeScale"};const b=["The quick brown fox jumps over the lazy dog.","Pack my box with five dozen liquor jugs."];function u({font:n,headingName:a,cssVar:t}){const[s,o]=l(t),r=`--ap-font-size-${n}-${a}`,[p,k]=l(r),N=`--ap-font-families-${n}`;return e.createElement("div",{className:"ap-type-token-swatch",ref:s},e.createElement("div",{className:"ap-type-token-heading-name"},a),e.createElement("div",{className:"ap-type-token-header"},e.createElement("span",{className:"ap-type-token-label"},o||"…"),e.createElement("span",{className:"ap-type-token-var"},t)),e.createElement("div",{className:"ap-type-token-var"},"on ",r," (",k||"…",")"),e.createElement("div",{ref:p,className:"ap-type-token-sample ap-type-token-sample--leading",style:{fontFamily:`var(${N}), sans-serif`,fontSize:`var(${r})`,lineHeight:`var(${t})`}},b.map(d=>e.createElement("div",{key:d},d))))}u.__docgenInfo={description:`One Line Height card: the heading-level name on its own line, then the
+live line-height value + CSS var name, then a wrapped paragraph sample
+rendered at that heading level's paired font size with the line-height
+applied -- so the leading (gap between wrapped lines) is actually
+visible, unlike Font Size's single-line samples.
+
+--ap-line-heights-* now resolves with "px" already baked in (e.g.
+"46px"), same as --ap-font-size-* -- see build-tokens.js's LINE HEIGHT
+UNIT FIX for the custom transform that appends it. Both liveLineHeight
+and liveFontSize are shown as-is, and \`line-height: var(\${cssVar})\` is
+used directly with no calc() coercion needed.`,methods:[],displayName:"LineHeightCard"};const z=()=>e.createElement("svg",{width:"12",height:"12",viewBox:"0 0 12 12",fill:"none",xmlns:"http://www.w3.org/2000/svg","aria-hidden":"true"},e.createElement("path",{d:"M2.5 4.5L6 8L9.5 4.5",stroke:"currentColor",strokeWidth:"1.5",strokeLinecap:"round",strokeLinejoin:"round"}));function m({font:n,items:a}){const[t,s]=h.useState(!0);return e.createElement("div",{className:"ap-type-font-group"},e.createElement("button",{type:"button",className:"ap-type-font-group-header",onClick:()=>s(o=>!o),"aria-expanded":t},e.createElement("span",{className:"ap-type-font-group-title"},n),e.createElement("span",{className:`ap-type-font-group-chevron${t?"":" ap-type-font-group-chevron--collapsed"}`},e.createElement(z,null))),t&&e.createElement("div",{className:"ap-type-token-group"},a.map(o=>e.createElement(u,{key:o.cssVar,font:n,headingName:o.key,cssVar:o.cssVar}))))}m.__docgenInfo={description:`Collapsible section for one font's Line Height scale -- structurally
+identical to FontSizeFontGroup.jsx, just swapping in LineHeightCard.
+Expanded by default.`,methods:[],displayName:"LineHeightFontGroup"};function _(){return e.createElement(f,null,e.createElement("div",{className:"ap-type-font-groups"},e.createElement(m,{font:"font1",items:i.lineHeight.font1}),e.createElement(m,{font:"font2",items:i.lineHeight.font2}),e.createElement(m,{font:"font3",items:i.lineHeight.font3})))}_.__docgenInfo={description:`Line Height page -- one collapsible group per font, same shape as
+FontSizeScale.jsx, wrapped in the same local Mobile/Tablet/Desktop
+toggle (see ViewportPreviewPanel.jsx).`,methods:[],displayName:"LineHeightScale"};function y({tokenKey:n,cssVar:a}){const[t,s]=l(a);return e.createElement("div",{className:"ap-type-token-swatch",ref:t},e.createElement("div",{className:"ap-type-token-heading-name"},n),e.createElement("div",{className:"ap-type-token-header"},e.createElement("span",{className:"ap-type-token-label"},s||"…"),e.createElement("span",{className:"ap-type-token-var"},a)))}y.__docgenInfo={description:`One Font Weight card: the token key (e.g. "regular", "100",
+"56-italic-weight") on its own line, then the live-computed value and
+CSS var name -- structurally identical to FontSizeCard's key/value/var
+rows, minus the alphabet-triplet sample. No sample here: a font weight
+has no useful "look" to preview on its own, without a specific font
+and size to render it in (unlike Font Size/Line Height/Letter
+Spacing, which are all inherently visual).`,methods:[],displayName:"FontWeightCard"};function v({groupName:n,items:a}){return e.createElement("div",{className:"ap-type-font-group"},e.createElement("div",{className:"ap-type-font-group-title"},n),e.createElement("div",{className:"ap-type-token-group"},a.map(t=>e.createElement(y,{key:t.cssVar,tokenKey:t.key,cssVar:t.cssVar}))))}v.__docgenInfo={description:`Static (non-collapsible) section for one Font Weight group. Unlike
+Font Size/Line Height's per-font groups, Font Weight's five groups
+are Tokens Studio's own raw group names (two shared choice pools --
+fontWeights_choices_text/_numbers -- plus one per font that references
+into them), not a toggle-able per-font breakdown, so there's no
+chevron/expand affordance here: just the group name as a plain
+heading, same title styling as the collapsible groups.`,methods:[],displayName:"FontWeightGroup"};function L({groups:n=i.fontWeight}){return e.createElement("div",{className:"ap-type-font-groups"},n.map(a=>e.createElement(v,{key:a.groupName,groupName:a.groupName,items:a.items})))}L.__docgenInfo={description:`Font Weight page -- one static group per Tokens Studio group:
+fontWeights_choices_text, fontWeights_choices_numbers, then
+font_weights_font_1/2/3 (the per-font groups that reference into the
+two choice pools). Order and group names come straight from the
+manifest, which mirrors Tokens Studio's own panel order.
+
+\`groups\` defaults to the full Core list (manifest.fontWeight) but can
+be overridden -- the Green/Gold Tier 1 pages pass
+manifest.fontWeightThemeDiffs.{green,gold} instead, which is already
+pre-filtered down to just the items whose value actually differs from
+Core (see generate-typography-manifest.js). Same component, same
+classes, just a different (smaller) data set -- nothing else changes.`,methods:[],displayName:"FontWeightScale",props:{groups:{defaultValue:{value:"manifest.fontWeight",computed:!0},required:!1}}};const C=["ABCDEFGHIJKLMNOPQRSTUVWXYZ","abcdefghijklmnopqrstuvwxyz","0123456789"],x="24px";function E({font:n,cssVar:a}){const[t,s]=l(a);return e.createElement("div",{className:"ap-type-token-swatch",ref:t},e.createElement("div",{className:"ap-type-token-heading-name"},n),e.createElement("div",{className:"ap-type-token-header"},e.createElement("span",{className:"ap-type-token-label"},s||"…"),e.createElement("span",{className:"ap-type-token-var"},a)),e.createElement("div",{className:"ap-type-token-sample",style:{fontFamily:`var(${a}), sans-serif`,fontSize:x}},C.map(o=>e.createElement("div",{key:o},o))))}E.__docgenInfo={description:`One Font Family card: the token key ("font1", "font2", "font3") on its
+own line, then the live-resolved family name + CSS var name, then an
+alphabet-triplet sample actually rendered in that family. Structurally
+identical to FontSizeCard, minus the per-heading-level nesting --
+fontFamilies is already flat (font1/font2/font3), so \`font\` and \`key\`
+are the same thing here.`,methods:[],displayName:"FontFamilyCard"};function H(){return e.createElement("div",{className:"ap-type-token-group"},i.fontFamily.map(n=>e.createElement(E,{key:n.cssVar,font:n.key,cssVar:n.cssVar})))}H.__docgenInfo={description:`Font Family page -- flat, no grouping, same as Letter Spacing: there's
+nothing to nest font1/2/3 under, they're already the top-level items.`,methods:[],displayName:"FontFamilyScale"};export{H as F,_ as L,F as a,L as b};
