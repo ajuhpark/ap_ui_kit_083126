@@ -101,7 +101,15 @@ const preview = {
 					"Tokens",
 					[
 						"Tier 1: Definitions",
-						["Tier 1 - Core", "Tier 1 - Green", "Tier 1 - Gold"],
+						[
+							// Pin Tier 1 - Core's own children too: without this, Color/
+							// Typography/Border fall back to alphabetical order (Border,
+							// Color, Typography), which is why Border used to show up first.
+							"Tier 1 - Core",
+							["Color", "Typography", "Border"],
+							"Tier 1 - Green",
+							"Tier 1 - Gold",
+						],
 						"Tier 2: Semantic",
 						["Tier 2 - Core", "Tier 2 - Green", "Tier 2 - Gold"],
 					],
