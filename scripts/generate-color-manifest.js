@@ -189,10 +189,28 @@ function buildTier2ThemeDiff(themeCssPath) {
 	);
 }
 
+// "Data Viz" used to live inside "Color Palettes" as a handful of
+// single-swatch families (Dataviz Orange/Purple/Pale Red Subtle/Pale Red
+// -- no numeric step, so buildFamilyScale already treats each as its own
+// one-swatch family). Split those out into their own scale/page instead
+// of teaching buildFamilyScale a "dataviz" special case -- same
+// rendering path (ColorScaleSection -> ColorPalette), just a different
+// `scales` entry. Family names come out of buildFamilyScale already
+// title-cased ("Dataviz Orange", ...), so the split matches on that
+// prefix. Confirmed identical across all three themes (core/green/gold),
+// same as everything else "Color Palettes" carries -- so, like Utility/
+// Neutral/Transparent, this only needs to appear on the Core Color page,
+// not duplicated onto Green/Gold Tier 1's pages.
+const colorPalettesScale = buildFamilyScale("--ap-color-color-palettes-", "Color Palettes");
+const dataVizFamilies = colorPalettesScale.families.filter((f) => f.name.startsWith("Dataviz"));
+colorPalettesScale.families = colorPalettesScale.families.filter((f) => !f.name.startsWith("Dataviz"));
+const dataVizScale = { title: "Data Viz", families: dataVizFamilies };
+
 const manifest = {
 	generatedFrom: CORE_CSS_PATH,
 	scales: [
-		buildFamilyScale("--ap-color-color-palettes-", "Color Palettes"),
+		colorPalettesScale,
+		dataVizScale,
 		buildFamilyScale("--ap-color-utility-", "Utility"),
 		buildFamilyScale("--ap-color-brand-", "Brand"),
 		buildFlatScale("--ap-color-neutral-", "Neutral"),
@@ -216,4 +234,6 @@ fs.writeFileSync(OUT_PATH, JSON.stringify(manifest, null, 2) + "\n");
 const diffCounts = Object.entries(manifest.tier2ThemeDiffs)
 	.map(([theme, grids]) => `${theme}=${grids ? grids.reduce((n, g) => n + g.items.length, 0) : "n/a"}`)
 	.join(", ");
-console.log(`✔︎ ${OUT_PATH} (${colorVars.length} color tokens; tier_2 diffs: ${diffCounts})`);
+console.log(
+	`✔︎ ${OUT_PATH} (${colorVars.length} color tokens; Color Palettes families: ${colorPalettesScale.families.length}, Data Viz families: ${dataVizScale.families.length}; tier_2 diffs: ${diffCounts})`,
+);

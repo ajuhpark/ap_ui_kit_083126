@@ -4,6 +4,12 @@ import { makeTier1ColorStories } from "./tier1ColorStories.jsx";
  * Sidebar: Tokens > Tier 1: Definitions > 1. Core > Color
  * Mirrors ap_ds_storybook's "Tier 1: Definitions / 1. Core" nav structure.
  * See tier1ColorStories.jsx for what actually renders and why.
+ *
+ * Data Viz is its own page here (split out of Color Palettes) -- like
+ * Utility/Neutral/Transparent, it's identical across all three themes, so
+ * it only needs to exist on this Core page, not duplicated onto Green/Gold
+ * Tier 1 (which only ever show "Brand" -- see ColorGreen.stories.jsx /
+ * ColorGold.stories.jsx).
  */
 export default {
 	title: "Tokens/Tier 1: Definitions/1. Core/Color",
@@ -21,6 +27,7 @@ export default {
 const stories = makeTier1ColorStories("core");
 
 export const ColorPalettes = stories.ColorPalettes;
+export const DataViz = stories.DataViz;
 export const Utility = stories.Utility;
 export const Brand = stories.Brand;
 export const Neutral = stories.Neutral;

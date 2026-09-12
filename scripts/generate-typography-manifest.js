@@ -6,11 +6,12 @@
  * only from built CSS, never values" architecture as
  * generate-color-manifest.js / generate-border-manifest.js.
  *
- * Covers Font Size, Line Height (per font: font1/font2/font3), and Letter
- * Spacing (flat, not per-font) so far. Text Case, Font Family, Font Weight
- * can extend this manifest the same way once those pages are built -- see
- * build/tier_1_core/css/variables.css for the full set of already-built
- * text-case / font-families / font-weights variables this could read from.
+ * Covers Font Size, Line Height (per font: font1/font2/font3), Letter
+ * Spacing (flat, not per-font), Font Weight (Tokens Studio's own raw
+ * groups), and Font Family (flat, per font: font1/font2/font3) so far.
+ * Text Case can extend this manifest the same way once that page is
+ * built -- see build/tier_1_core/css/variables.css for the full set of
+ * already-built variables this could read from.
  *
  * fontSize and lineHeight are keyed by heading level names (h1, h2-lg, h2,
  * ...) rather than a flat numbered scale like ap_ds_storybook's -- see the
@@ -49,12 +50,88 @@
  * through untouched, unit intact. Confirmed against the actual build
  * output: --ap-letter-spacing-2: 2px, --ap-letter-spacing-minus-1: -1px,
  * etc. -- all correct, no calc() workaround needed here.
+ *
+ * FONT WEIGHT is structured differently from all of the above: rather
+ * than a per-font scale, Tokens Studio has five separate raw groups --
+ * two shared "choice pools" (fontWeights_choices_text,
+ * fontWeights_choices_numbers) that font_weights_font_1/2/3 each
+ * reference into. There's no meaningful "font1/font2/font3" simplified
+ * label for the two choice pools, so the manifest (and the rendered
+ * page) uses Tokens Studio's own raw group names verbatim as the display
+ * label, per the source of truth rather than an invented one.
+ *
+ * Two build quirks specific to Font Weight, both left as-is (read
+ * live, not special-cased) rather than "fixed" here:
+ *  - font_weights_font_1/2/3 build to `--ap-font-weights-font-1-*`,
+ *    `-font-2-`, `-font-3-` (HYPHENATED "font-1"), unlike fontSize/
+ *    lineHeight's `-font1-`/`-font2-`/`-font3-` (no hyphen) -- an
+ *    inconsistency in the token source naming, not something this script
+ *    introduces.
+ *  - fontWeights_choices_text.56_italic is the one token in this whole
+ *    project whose $value ("56 Italic") sd-transforms splits into TWO
+ *    separate CSS variables instead of one:
+ *    --ap-font-weights-choices-text-56-italic-weight (56) and
+ *    -56-italic-style (italic). Since this script extracts names
+ *    generically from built CSS rather than hand-mapping tokens to
+ *    variables, that split just falls out naturally as two adjacent
+ *    cards ("56-italic-weight", "56-italic-style") -- no special case
+ *    needed, and it stays correct if the transform's behavior here ever
+ *    changes.
+ *
+ * FONT FAMILY is the simplest of the bunch: a flat fontFamilies.font1/
+ * font2/font3 group, one CSS var each (--ap-font-families-font1/2/3),
+ * same "font1/font2/font3" keys already used as the `font` selector
+ * elsewhere on this page (FontSizeCard, LineHeightCard, etc.).
+ *
+ * ---------------------------------------------------------------------
+ * GREEN TIER 1 / GOLD TIER 1: tokens.json's tier_1_green/tier_1_gold
+ * override fontSize, lineHeights, fontFamilies, and font_weights_font_1/
+ * 2/3 (confirmed: NOT fontWeights_choices_text/_numbers, letterSpacing,
+ * or textCase/textDecoration -- those are identical to Core in every
+ * theme, so they get no Green/Gold page at all). But the SHAPE of each
+ * override differs, which is why some properties reuse the Core scale
+ * outright while Font Weight needs actual per-item diffing:
+ *
+ *  - fontSize/lineHeight: green/gold only override each font's
+ *    headingScale/bodyTextScale (plus a redundant h1) -- but every
+ *    step's formula is base * scale^n, so that cascades to change EVERY
+ *    step. Confirmed against the built CSS: full-scale difference, no
+ *    step left unchanged. So TypographyGreen/Gold.stories.jsx just
+ *    reuse FontSizeScale/LineHeightScale completely unchanged, pinned
+ *    to the theme global -- there's nothing to filter, the "diff" IS
+ *    the whole scale.
+ *  - fontFamilies: only 3 tokens total, and all 3 differ in every
+ *    theme (core: TWK Lausanne/TWK Continental/Novela; green AND gold:
+ *    both resolve to Basier Circle/Basier Square/Basier Square Mono) --
+ *    same "full replacement" shape as fontSize/lineHeight, so
+ *    FontFamilyScale is reused unchanged too.
+ *  - font_weights_font_1/2/3: NOT a formula scale -- each key is an
+ *    independent literal value, so unlike the above, some values
+ *    coincidentally match Core (e.g. font_1/font_2's "bold" is 700 in
+ *    every theme) while others don't, AND green/gold each add three
+ *    brand-new keys Core doesn't have at all (medium/thin/heavy).
+ *    That's a real per-item diff, so this manifest computes
+ *    fontWeightThemeDiffs.{green,gold} the same way generate-color-
+ *    manifest.js's buildTier2ThemeDiff does: diff each theme's built CSS
+ *    value against Core's for every font_weights_font_* var (not the
+ *    two choice pools, which never change), keep only the ones that
+ *    differ (including brand-new ones, where Core simply has no value
+ *    to compare against), and drop any group left with zero items
+ *    (fontWeights_choices_text/_numbers always end up empty this way,
+ *    since nothing in them ever changes). FontWeightScale.jsx takes an
+ *    optional `groups` prop so the Green/Gold pages can pass this
+ *    filtered list through the exact same component instead of the
+ *    full manifest.fontWeight.
  * ============================================================================
  */
 
 import fs from "node:fs";
 
 const CORE_CSS_PATH = "build/tier_1_core/css/variables.css";
+const THEME_CSS_PATHS = {
+	green: "build/tier_1_green/css/variables.css",
+	gold: "build/tier_1_gold/css/variables.css",
+};
 const OUT_DIR = "tokens/generated";
 const OUT_PATH = `${OUT_DIR}/typography-manifest.json`;
 
@@ -73,6 +150,16 @@ function parseCssVarNames(cssText) {
 		names.push(match[1]);
 	}
 	return names;
+}
+
+function parseCssVarValues(cssText) {
+	const map = new Map();
+	varRe.lastIndex = 0;
+	let match;
+	while ((match = varRe.exec(cssText))) {
+		map.set(match[1], match[2].trim());
+	}
+	return map;
 }
 
 const NON_STEP_SUFFIXES = new Set(["base", "heading-scale", "body-text-scale"]);
@@ -96,7 +183,50 @@ function buildLetterSpacingScale(allNames) {
 	return buildScale(allNames, "--ap-letter-spacing-");
 }
 
+function buildFontFamilyScale(allNames) {
+	return buildScale(allNames, "--ap-font-families-");
+}
+
+// Display order matches the Tokens Studio panel: the two shared choice
+// pools first, then the three per-font groups that reference into them.
+const FONT_WEIGHT_GROUPS = [
+	{ groupName: "fontWeights_choices_text", prefix: "--ap-font-weights-choices-text-" },
+	{ groupName: "fontWeights_choices_numbers", prefix: "--ap-font-weights-choices-numbers-" },
+	{ groupName: "font_weights_font_1", prefix: "--ap-font-weights-font-1-" },
+	{ groupName: "font_weights_font_2", prefix: "--ap-font-weights-font-2-" },
+	{ groupName: "font_weights_font_3", prefix: "--ap-font-weights-font-3-" },
+];
+
+function buildFontWeightGroups(allNames) {
+	return FONT_WEIGHT_GROUPS.map(({ groupName, prefix }) => ({
+		groupName,
+		items: buildScale(allNames, prefix),
+	}));
+}
+
+// Per-theme Font Weight diff: only the items whose live value actually
+// differs from Core (a brand-new key Core doesn't define at all counts
+// as differing too -- coreValues.get(...) is undefined, which never
+// equals a real string). Groups left with nothing that differs are
+// dropped entirely, same as generate-color-manifest.js's
+// buildTier2ThemeDiff drops empty grids.
+function buildFontWeightThemeDiff(coreValues, themeCssPath) {
+	if (!fs.existsSync(themeCssPath)) {
+		console.warn(`  (skipping font-weight theme diff -- ${themeCssPath} not found)`);
+		return null;
+	}
+	const themeValues = parseCssVarValues(fs.readFileSync(themeCssPath, "utf-8"));
+	const themeNames = Array.from(themeValues.keys());
+	return FONT_WEIGHT_GROUPS.map(({ groupName, prefix }) => ({
+		groupName,
+		items: buildScale(themeNames, prefix).filter(
+			(item) => themeValues.get(item.cssVar) !== coreValues.get(item.cssVar),
+		),
+	})).filter((group) => group.items.length > 0);
+}
+
 const allNames = parseCssVarNames(fs.readFileSync(CORE_CSS_PATH, "utf-8"));
+const coreValues = parseCssVarValues(fs.readFileSync(CORE_CSS_PATH, "utf-8"));
 
 const manifest = {
 	generatedFrom: CORE_CSS_PATH,
@@ -111,12 +241,24 @@ const manifest = {
 		font3: buildLineHeightScale(allNames, "font3"),
 	},
 	letterSpacing: buildLetterSpacingScale(allNames),
+	fontWeight: buildFontWeightGroups(allNames),
+	fontFamily: buildFontFamilyScale(allNames),
+	fontWeightThemeDiffs: {
+		green: buildFontWeightThemeDiff(coreValues, THEME_CSS_PATHS.green),
+		gold: buildFontWeightThemeDiff(coreValues, THEME_CSS_PATHS.gold),
+	},
 };
 
 fs.mkdirSync(OUT_DIR, { recursive: true });
 fs.writeFileSync(OUT_PATH, JSON.stringify(manifest, null, 2) + "\n");
+const fontWeightDiffCounts = Object.entries(manifest.fontWeightThemeDiffs)
+	.map(([theme, groups]) => `${theme}=${groups ? groups.reduce((n, g) => n + g.items.length, 0) : "n/a"}`)
+	.join(", ");
 console.log(
 	`✔︎ ${OUT_PATH} (font-size steps -- font1: ${manifest.fontSize.font1.length}, font2: ${manifest.fontSize.font2.length}, font3: ${manifest.fontSize.font3.length}; ` +
 		`line-height steps -- font1: ${manifest.lineHeight.font1.length}, font2: ${manifest.lineHeight.font2.length}, font3: ${manifest.lineHeight.font3.length}; ` +
-		`letter-spacing steps: ${manifest.letterSpacing.length})`,
+		`letter-spacing steps: ${manifest.letterSpacing.length}; ` +
+		`font-weight groups -- ${manifest.fontWeight.map((g) => `${g.groupName}: ${g.items.length}`).join(", ")}; ` +
+		`font-family steps: ${manifest.fontFamily.length}; ` +
+		`font-weight theme diffs: ${fontWeightDiffCounts})`,
 );

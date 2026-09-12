@@ -71,8 +71,13 @@
 
 /* The heading-level name (e.g. "h1", "h2-lg") -- sits above the
    size/var row, unlike ap_ds_storybook's cards which have no equivalent
-   grouping concept. */
+   grouping concept. font-family is set explicitly here (not just
+   inherited from .ap-type-font-groups) since flat, non-grouped pages
+   like Font Family/Letter Spacing use this class inside
+   .ap-type-token-group instead, which doesn't set a font-family --
+   without it those labels fall back to the browser's default serif. */
 .ap-type-token-heading-name {
+	font-family: -apple-system, system-ui, sans-serif;
 	font-size: 1rem;
 	font-weight: 500;
 	color: #1a1a1a;
@@ -137,7 +142,7 @@
    page) is visible at all. Font Size's cards stay content-width because
    a single unbroken line has nothing to wrap. */
 .ap-type-token-sample--leading {
-	max-width: 16rem;
+	/* max-width: 16rem; */
 	word-wrap: break-word;
 	overflow-wrap: break-word;
 }

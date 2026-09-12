@@ -1,7 +1,14 @@
 import React from "react";
 import { useLiveCssValue } from "../Color/useLiveCssValue.js";
 
-const SAMPLE_TEXT = "The quick brown fox jumps over the lazy dog. Pack my box with five dozen liquor jugs.";
+// Two sentences, each its own line -- rendered as separate <div>s (same
+// pattern as the alphabet-triplet SAMPLE_LINES elsewhere) rather than one
+// string, so the second sentence doesn't just wrap wherever it happens to
+// run out of width on the first.
+const SAMPLE_LINES = [
+	"The quick brown fox jumps over the lazy dog.",
+	"Pack my box with five dozen liquor jugs.",
+];
 
 /**
  * One Line Height card: the heading-level name on its own line, then the
@@ -47,7 +54,9 @@ export function LineHeightCard({ font, headingName, cssVar }) {
 					lineHeight: `calc(var(${cssVar}) * 1px)`,
 				}}
 			>
-				{SAMPLE_TEXT}
+				{SAMPLE_LINES.map((line) => (
+					<div key={line}>{line}</div>
+				))}
 			</div>
 		</div>
 	);
