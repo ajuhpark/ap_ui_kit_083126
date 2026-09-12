@@ -89,7 +89,7 @@ The live site is deployed via the `gh-pages` package, which pushes the contents 
 npm run build-storybook && npm run deploy-storybook
 ```
 
-any time you want to publish the latest version. Currently live at https://ajuhpark.github.io/ap_ui_kit_083126/ (this URL follows the repo's current name on GitHub, so it'll change if the repo is ever renamed).
+any time you want to publish the latest version. Currently live at https://ajuhpark.github.io/ap_ds_storybook/ (this URL follows the repo's current name on GitHub, so it'll change if the repo is ever renamed).
 
 ## Known issues / open items
 

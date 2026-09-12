@@ -1,5 +1,5 @@
 {
-  "name": "ap-ui-kit",
+  "name": "ap-ds-storybook",
   "version": "1.0.0",
   "type": "module",
   "description": "This example code is bare-bones to show you what this framework can do. If you have the style-dictionary module installed globally, you can `cd` into this directory and run: ```bash style-dictionary build ```",
@@ -13,14 +13,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ajuhpark/ap-ui-kit.git"
+    "url": "git+https://github.com/ajuhpark/ap_ds_storybook.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/ajuhpark/ap-ui-kit/issues"
+    "url": "https://github.com/ajuhpark/ap_ds_storybook/issues"
   },
-  "homepage": "https://github.com/ajuhpark/ap-ui-kit#readme",
+  "homepage": "https://github.com/ajuhpark/ap_ds_storybook#readme",
   "dependencies": {
     "@tokens-studio/sd-transforms": "^2.0.3",
     "react": "^19.2.8",

@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"name": "ap_ds_storybook",
+			"path": "."
+		},
+		{
+			"name": "ap_ds_storybook_subatomic",
+			"path": "../ap_ds_storybook_subatomic"
+		},
+		{
+			"path": "../codevolution_react_storybook_tutorial"
+		}
+	],
+	"settings": {}
+}
