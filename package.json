@@ -13,14 +13,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ajuhpark/ap_ds_storybook.git"
+    "url": "git+https://github.com/andrewjypark/ap_ds_storybook.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/ajuhpark/ap_ds_storybook/issues"
+    "url": "https://github.com/andrewjypark/ap_ds_storybook/issues"
   },
-  "homepage": "https://github.com/ajuhpark/ap_ds_storybook#readme",
+  "homepage": "https://github.com/andrewjypark/ap_ds_storybook#readme",
   "dependencies": {
     "@tokens-studio/sd-transforms": "^2.0.3",
     "react": "^19.2.8",
