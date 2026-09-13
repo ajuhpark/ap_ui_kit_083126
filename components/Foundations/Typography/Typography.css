@@ -35,11 +35,11 @@
 	font-family: -apple-system, system-ui, sans-serif;
 	font-size: 0.875rem;
 	line-height: 1.5;
-	color: #4d4d4d;
+	color: var(--ap-tier-2-color-content-subtle);
 }
 
 .ap-type-responsive-note strong {
-	color: #1a1a1a;
+	color: var(--ap-tier-2-color-content-default);
 	font-weight: 700;
 }
 
@@ -55,7 +55,7 @@
 	font-family: -apple-system, system-ui, sans-serif;
 	font-size: 0.8125rem;
 	font-weight: 600;
-	color: #4d4d4d;
+	color: var(--ap-tier-2-color-content-subtle);
 	background: #fff;
 	border: none;
 	border-right: 1px solid #d4d4d4;
@@ -93,7 +93,7 @@
 .ap-type-font-group-title {
 	font-size: 1.125rem;
 	font-weight: 700;
-	color: #1a1a1a;
+	color: var(--ap-tier-2-color-content-default);
 }
 
 .ap-type-font-group-chevron {
@@ -136,7 +136,7 @@
 	font-family: -apple-system, system-ui, sans-serif;
 	font-size: 1rem;
 	font-weight: 500;
-	color: #1a1a1a;
+	color: var(--ap-tier-2-color-content-default);
 } 
 
 .ap-type-token-header {
@@ -150,14 +150,14 @@
 	font-family: -apple-system, system-ui, sans-serif;
 	font-size: 0.8rem;
 	font-weight: 600;
-	color: #737373;
+	color: var(--ap-tier-2-color-content-subtle);
 	white-space: nowrap;
 }
 
 .ap-type-token-var {
 	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 	font-size: 0.8rem;
-	color: #8a8a8a;
+	color: var(--ap-tier-2-color-content-subtle);
 	white-space: nowrap;
 }
 
@@ -171,18 +171,18 @@
 	font-family: -apple-system, system-ui, sans-serif;
 	font-size: 1.25rem;
 	font-weight: 700;
-	color: #1a1a1a;
+	color: var(--ap-tier-2-color-content-default);
 	white-space: nowrap;
 }
 
 .ap-token-value {
 	font-family: -apple-system, system-ui, sans-serif;
 	font-size: 1rem;
-	color: #737373;
+	color: var(--ap-tier-2-color-content-subtle);
 }
 
 .ap-type-token-sample {
-	color: #1a1a1a;
+	color: var(--ap-tier-2-color-content-default);
 	line-height: 1.2;
 	/* Same reasoning as ap_ds_storybook's Typography.css: the
 	   alphabet-triplet sample is single unbroken "words" that would
@@ -190,6 +190,7 @@
 	   past the container width. */
 	overflow-wrap: normal;
 	word-wrap: normal;
+	font-weight: 300;
 }
 
 /* Line Height's sample is real wrapped prose, not Font Size's unbroken
@@ -228,7 +229,7 @@
 }
 
 .ap-type-composite-sample {
-	color: #1a1a1a;
+	color: var(--ap-tier-2-color-content-default);
 	/* font/letter-spacing/text-transform/text-decoration all come from
 	   the live var() values set inline (see CompositeStyleCard.jsx) --
 	   nothing typographic is hard-coded here. */
@@ -258,14 +259,14 @@
 	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 	font-size: 0.8rem;
 	font-weight: 400;
-	color: #1a1a1a;
+	color: var(--ap-tier-2-color-content-default);
 	white-space: nowrap;
 }
 
 .ap-type-composite-readout-var {
 	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 	font-size: 0.8rem;
-	color: #8a8a8a;
+	color: var(--ap-tier-2-color-content-subtle);
 	white-space: nowrap;
 }
 
@@ -279,5 +280,5 @@
 	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 	font-size: 0.8rem;
 	font-weight: 400;
-	color: #1a1a1a;
+	color: var(--ap-tier-2-color-content-default);
 }
